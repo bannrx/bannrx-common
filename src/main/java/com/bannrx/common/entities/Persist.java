@@ -10,7 +10,6 @@ import java.util.Date;
 
 @Data
 @MappedSuperclass
-@Entity
 @AllArgsConstructor
 public class Persist {
 

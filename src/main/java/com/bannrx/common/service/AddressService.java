@@ -5,6 +5,7 @@ import com.bannrx.common.entities.Address;
 import com.bannrx.common.entities.User;
 import com.bannrx.common.repository.AddressRepository;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import rklab.utility.expectations.InvalidInputException;
 import rklab.utility.expectations.ServerException;
@@ -13,7 +14,7 @@ import rklab.utility.utilities.ObjectMapperUtils;
 
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AddressService {
 
     private static final String DELETE_MSG = "Address(s) has been deleted";
@@ -26,7 +27,6 @@ public class AddressService {
         Address address = new Address();
         User user = userService.findByPhoneNo(addressDto.getPhoneNo());
         ObjectMapperUtils.map(addressDto,address);
-        user.setAddress(address);
         addressRepository.save(address);
         return ObjectMapperUtils.map(address, AddressDto.class);
     }
@@ -40,20 +40,20 @@ public class AddressService {
 
 
     public void canAddressBeAdded(User user, AddressDto addressDto) throws InvalidInputException {
-        if (user.getAddress() != null){
+        /*if (user.getAddress() != null){
             throw new InvalidInputException("You can add only 1 addresses to add new address delete existing address.");
-        }
+        }*/
     }
 
 
-    public boolean isSameAddressExist(AddressDto addressDto, User user) {
+    /*public boolean isSameAddressExist(AddressDto addressDto, User user) {
        var address = user.getAddress();
         return addressDto.getAddressLine1().equalsIgnoreCase(address.getAddressLine1())
                 && addressDto.isAddressLine2Equal(address.getAddressLine2())
                 && addressDto.getPincode().equalsIgnoreCase(address.getPinCode())
                 && addressDto.getCity().equalsIgnoreCase(address.getCity())
                 && addressDto.getState().equalsIgnoreCase(address.getState());
-    }
+    }*/
 
     public AddressDto update(AddressDto addressDto) throws InvalidInputException, ServerException {
         var address = fetchById(addressDto.getId());

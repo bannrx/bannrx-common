@@ -1,4 +1,5 @@
 package com.bannrx.common.entities;
+import com.bannrx.common.dtos.Persist;
 import jakarta.persistence.*;
 import lombok.*;
 import rklab.utility.utilities.JsonUtils;
@@ -12,10 +13,6 @@ import rklab.utility.utilities.JsonUtils;
 @NoArgsConstructor
 @Table
 public class Address extends Persist {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
 
     @Column(name = "address_line1")
     private String addressLine1;

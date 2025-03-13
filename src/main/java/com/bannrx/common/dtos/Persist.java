@@ -1,4 +1,4 @@
-package com.bannrx.common.entities;
+package com.bannrx.common.dtos;
 
 import com.bannrx.common.enums.Status;
 import jakarta.persistence.*;
@@ -25,6 +25,7 @@ public class Persist {
         this.modifiedBy = modifiedBy;
     }
 
+    @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 

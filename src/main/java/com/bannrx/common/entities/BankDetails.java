@@ -1,5 +1,6 @@
 package com.bannrx.common.entities;
 
+import com.bannrx.common.dtos.Persist;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,9 +15,6 @@ import rklab.utility.utilities.JsonUtils;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BankDetails extends Persist {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
 
     @Column(name = "account_no")
     private Long accountNo;
@@ -30,9 +28,6 @@ public class BankDetails extends Persist {
     @Column(name = "verification_process_id")
     private String verificationProcessId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
     
     public BankDetails(String createdBy,String modifiedBy){
         super(createdBy,modifiedBy);

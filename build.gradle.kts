@@ -52,16 +52,19 @@ publishing {
 
 repositories {
 	mavenCentral()
-	val user: String? = project.findProperty("utility-username") as String? ?: System.getenv("GITHUB_USERNAME")
-	val token: String? = project.findProperty("utility-token") as String? ?: System.getenv("GITHUB_TOKEN")
-	val repo = "utility"
-	val gitUrl = "https://maven.pkg.github.com/${user}/${repo}"
-	maven {
-		name = "GitHubPackages"
-		url = uri(gitUrl)
-		credentials {
-			username = user
-			password = token
+	var env = project.findProperty("environment") as String? ?: System.getenv("ENVIRONMENT")
+	if (env != "local"){
+		val user: String? = project.findProperty("utility-username") as String? ?: System.getenv("GITHUB_USERNAME")
+		val token: String? = project.findProperty("utility-token") as String? ?: System.getenv("GITHUB_TOKEN")
+		val repo = "utility"
+		val gitUrl = "https://maven.pkg.github.com/${user}/${repo}"
+		maven {
+			name = "GitHubPackages"
+			url = uri(gitUrl)
+			credentials {
+				username = user
+				password = token
+			}
 		}
 	}
 }
@@ -80,7 +83,12 @@ dependencies {
 
 
 	//added
-	implementation("com.rklab:utility:0.0.1-SNAPSHOT")
+	var env = project.findProperty("environment") as String? ?: System.getenv("ENVIRONMENT")
+	if (env == "local"){
+		implementation(project(":utility"))
+	} else {
+		implementation("com.rklab:utility:0.0.1-SNAPSHOT")
+	}
 	implementation("org.springframework.boot:spring-boot-starter-security:3.1.0")
 	implementation("org.springframework.security:spring-security-config:6.0.0")
 }

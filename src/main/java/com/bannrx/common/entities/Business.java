@@ -1,5 +1,6 @@
 package com.bannrx.common.entities;
 
+import com.bannrx.common.dtos.Persist;
 import com.bannrx.common.enums.BusinessType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,10 +15,7 @@ import rklab.utility.utilities.JsonUtils;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Business extends Persist{
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+public class Business extends Persist {
 
     @Column(name = "name")
     private String name;
@@ -25,9 +23,6 @@ public class Business extends Persist{
     @Column(name = "type")
     private BusinessType type;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
 
     public Business(String createdBy,String modifiedBy){
         super(createdBy,modifiedBy);

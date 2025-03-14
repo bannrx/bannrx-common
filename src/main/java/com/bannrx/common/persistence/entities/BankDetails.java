@@ -1,19 +1,15 @@
-package com.bannrx.common.entities;
+package com.bannrx.common.persistence.entities;
 
-import com.bannrx.common.dtos.Persist;
+import com.bannrx.common.persistence.Persist;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import rklab.utility.utilities.JsonUtils;
 
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class BankDetails extends Persist {
 
     @Column(name = "account_no")
@@ -28,9 +24,9 @@ public class BankDetails extends Persist {
     @Column(name = "verification_process_id")
     private String verificationProcessId;
 
-    
-    public BankDetails(String createdBy,String modifiedBy){
-        super(createdBy,modifiedBy);
+    @Override
+    public String getPrefix() {
+        return "BD";
     }
 
     public String toString(){

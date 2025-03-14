@@ -1,12 +1,12 @@
 package com.bannrx.common.service;
 
 import com.bannrx.common.dtos.AddressDto;
-import com.bannrx.common.entities.Address;
-import com.bannrx.common.entities.User;
+import com.bannrx.common.persistence.entities.Address;
+import com.bannrx.common.persistence.entities.User;
 import com.bannrx.common.repository.AddressRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import rklab.utility.annotations.Loggable;
 import rklab.utility.expectations.InvalidInputException;
 import rklab.utility.expectations.ServerException;
 import rklab.utility.utilities.ObjectMapperUtils;
@@ -14,6 +14,7 @@ import rklab.utility.utilities.ObjectMapperUtils;
 
 
 @Service
+@Loggable
 @RequiredArgsConstructor
 public class AddressService {
 

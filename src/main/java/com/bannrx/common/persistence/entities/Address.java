@@ -1,5 +1,5 @@
-package com.bannrx.common.entities;
-import com.bannrx.common.dtos.Persist;
+package com.bannrx.common.persistence.entities;
+import com.bannrx.common.persistence.Persist;
 import jakarta.persistence.*;
 import lombok.*;
 import rklab.utility.utilities.JsonUtils;
@@ -9,8 +9,6 @@ import rklab.utility.utilities.JsonUtils;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Table
 public class Address extends Persist {
 
@@ -35,9 +33,9 @@ public class Address extends Persist {
     @Column(name = "longitude")
     private Double longitude;
 
-    //generic
-    public Address(String createdBy,String modifiedBy){
-        super(createdBy,modifiedBy);
+    @Override
+    public String getPrefix() {
+        return "AD";
     }
 
     public String toString(){

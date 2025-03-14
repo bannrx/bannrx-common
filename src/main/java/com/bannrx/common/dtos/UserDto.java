@@ -1,6 +1,6 @@
 package com.bannrx.common.dtos;
 
-import com.bannrx.common.entities.User;
+import com.bannrx.common.persistence.entities.User;
 import com.bannrx.common.validationGroups.AddOrderValidationGroup;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;

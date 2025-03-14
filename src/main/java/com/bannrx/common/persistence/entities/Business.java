@@ -1,19 +1,15 @@
-package com.bannrx.common.entities;
+package com.bannrx.common.persistence.entities;
 
-import com.bannrx.common.dtos.Persist;
+import com.bannrx.common.persistence.Persist;
 import com.bannrx.common.enums.BusinessType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import rklab.utility.utilities.JsonUtils;
 
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 public class Business extends Persist {
 
@@ -23,9 +19,9 @@ public class Business extends Persist {
     @Column(name = "type")
     private BusinessType type;
 
-
-    public Business(String createdBy,String modifiedBy){
-        super(createdBy,modifiedBy);
+    @Override
+    public String getPrefix() {
+        return "BU";
     }
 
     public String toString(){

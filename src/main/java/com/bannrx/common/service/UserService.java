@@ -2,25 +2,25 @@ package com.bannrx.common.service;
 
 import com.bannrx.common.dtos.SignUpRequest;
 import com.bannrx.common.dtos.UserDto;
-import com.bannrx.common.entities.User;
+import com.bannrx.common.persistence.entities.User;
 import com.bannrx.common.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import rklab.utility.annotations.Loggable;
 import rklab.utility.expectations.InvalidInputException;
 import rklab.utility.expectations.ServerException;
 import rklab.utility.utilities.ObjectMapperUtils;
 import java.util.Optional;
 
-
-
 @Service
+@Loggable
 @RequiredArgsConstructor
 public class UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public User createUser(SignUpRequest request) {
-        var retVal = new User(request.getPhoneNo(), request.getPhoneNo());
+        var retVal = new User();
         retVal.setName(request.getName());
         retVal.setPhoneNo(request.getPhoneNo());
         return userRepository.save(retVal);
@@ -63,4 +63,17 @@ public class UserService {
     public boolean isAlreadyRegister(SignUpRequest request) {
         return existingContactNo(request.getPhoneNo());
     }
+
+    /**
+     * Fetches the user for the header context
+     * This is yet to be implemented
+     *
+     * @return user
+     */
+    public User getLoggedInUser(){
+        var retVal = new User();
+        retVal.setId("default");
+        return retVal;
+    }
+
 }

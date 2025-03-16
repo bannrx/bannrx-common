@@ -1,10 +1,15 @@
 package com.bannrx.common.service;
 
-import com.bannrx.common.dtos.SignUpRequest;
+import com.bannrx.common.dtos.RegisterUser;
 import com.bannrx.common.dtos.UserDto;
 import com.bannrx.common.persistence.entities.User;
 import com.bannrx.common.repository.UserRepository;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import rklab.utility.annotations.Loggable;
 import rklab.utility.expectations.InvalidInputException;
@@ -14,15 +19,16 @@ import java.util.Optional;
 
 @Service
 @Loggable
-@RequiredArgsConstructor
-public class UserService {
+@NoArgsConstructor
+public class UserService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    public User createUser(SignUpRequest request) {
-        var retVal = new User();
-        retVal.setName(request.getName());
-        retVal.setPhoneNo(request.getPhoneNo());
+    public User createUser(RegisterUser request) throws ServerException {
+        var retVal = ObjectMapperUtils.map(request, User.class);
+        retVal.setCreatedBy(retVal.getEmail());
+        retVal.setModifiedBy(retVal.getEmail());
         return userRepository.save(retVal);
     }
 
@@ -48,10 +54,27 @@ public class UserService {
                         String.format("User not found with Id %s", id)));
     }
 
-    public User findByPhoneNo(String phoneNo) throws InvalidInputException {
+    /**
+     * Gets by id.
+     *
+     * @param id the id
+     * @return Optional user
+     */
+    public Optional<User> getById(String id){
+        return userRepository.findById(id);
+    }
+
+    public User fetchByPhoneNo(String phoneNo) throws InvalidInputException {
         return userRepository.findByPhoneNo(phoneNo)
                 .orElseThrow(() -> new InvalidInputException(
                         String.format("User not found with phone no %s", phoneNo)
+                ));
+    }
+
+    public User fetchByEmail(String email) throws InvalidInputException {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new InvalidInputException(
+                        String.format("User not found with email %s", email)
                 ));
     }
 
@@ -60,8 +83,16 @@ public class UserService {
         return userMayBe.isPresent();
     }
 
-    public boolean isAlreadyRegister(SignUpRequest request) {
-        return existingContactNo(request.getPhoneNo());
+    public boolean existingEmail(String email){
+        Optional<User> userMayBe = userRepository.findByEmail(email);
+        return userMayBe.isPresent();
+    }
+
+    public boolean isAlreadyRegister(RegisterUser request) {
+        return (
+                existingContactNo(request.getPhoneNo()) ||
+                        existingEmail(request.getEmail())
+        );
     }
 
     /**
@@ -76,4 +107,12 @@ public class UserService {
         return retVal;
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        var userMayBe = getById(username);
+        if (userMayBe.isPresent()){
+            return userMayBe.get();
+        }
+        throw new UsernameNotFoundException("User not found");
+    }
 }

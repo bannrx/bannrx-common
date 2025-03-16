@@ -1,4 +1,4 @@
-rootProject.name = "common"
+rootProject.name = "bannrx-common"
 
 //Uncomment below section only for local testing
 //include("utility")

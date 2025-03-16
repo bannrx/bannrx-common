@@ -1,6 +1,7 @@
 package com.bannrx.common.persistence.entities;
 
 import com.bannrx.common.persistence.Persist;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,6 +26,7 @@ public class BankDetails extends Persist {
     private String verificationProcessId;
 
     @Override
+    @JsonIgnore
     public String getPrefix() {
         return "BD";
     }

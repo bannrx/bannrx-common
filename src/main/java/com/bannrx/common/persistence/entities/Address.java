@@ -1,5 +1,6 @@
 package com.bannrx.common.persistence.entities;
 import com.bannrx.common.persistence.Persist;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import rklab.utility.utilities.JsonUtils;
@@ -34,6 +35,7 @@ public class Address extends Persist {
     private Double longitude;
 
     @Override
+    @JsonIgnore
     public String getPrefix() {
         return "AD";
     }

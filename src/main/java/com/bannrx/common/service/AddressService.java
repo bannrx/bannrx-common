@@ -26,7 +26,7 @@ public class AddressService {
 
     public AddressDto addAddress(AddressDto addressDto) throws ServerException, InvalidInputException {
         Address address = new Address();
-        User user = userService.findByPhoneNo(addressDto.getPhoneNo());
+        User user = userService.fetchByPhoneNo(addressDto.getPhoneNo());
         ObjectMapperUtils.map(addressDto,address);
         addressRepository.save(address);
         return ObjectMapperUtils.map(address, AddressDto.class);

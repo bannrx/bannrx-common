@@ -4,6 +4,7 @@ import com.bannrx.common.dtos.BusinessDto;
 import com.bannrx.common.enums.BusinessType;
 import com.bannrx.common.enums.Status;
 import com.bannrx.common.persistence.entities.Business;
+import com.bannrx.common.persistence.entities.User;
 import com.bannrx.common.repository.BusinessRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

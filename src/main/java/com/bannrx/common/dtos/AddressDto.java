@@ -4,8 +4,10 @@ import com.bannrx.common.validationGroups.AddOrderValidationGroup;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
+import static rklab.utility.constants.GlobalConstants.RegexPattern.PIN_CODE_REGEX;
 
 
 @Data
@@ -25,8 +27,10 @@ public class AddressDto {
     @NotBlank(message = "State cannot be empty")
     private String state;
 
-    @NotBlank(message = "Pin code cannot be empty")
+    @Pattern(regexp = PIN_CODE_REGEX, message = "Invalid PIN code. Must be a 6-digit number starting with 1-9.")
+    @NotBlank(message = "PIN code cannot be empty")
     private String pincode;
+
 
     @NotNull(message = "Latitude can not be empty")
     private Double latitude;

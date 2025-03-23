@@ -96,6 +96,11 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-security")
+	testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.1")
+	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.2")
+	testImplementation("org.mockito:mockito-core:5.14.2")
+	testImplementation("org.mockito:mockito-junit-jupiter:5.14.2")
+
 }
 
 tasks.withType<Test> {

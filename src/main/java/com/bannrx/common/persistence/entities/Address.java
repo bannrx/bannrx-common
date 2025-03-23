@@ -1,5 +1,6 @@
 package com.bannrx.common.persistence.entities;
 import com.bannrx.common.persistence.Persist;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,7 +8,7 @@ import rklab.utility.utilities.JsonUtils;
 
 
 
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = {"user"})
 @Entity
 @Data
 @Table
@@ -34,8 +35,9 @@ public class Address extends Persist {
     @Column(name = "longitude")
     private Double longitude;
 
+    @JsonBackReference
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Override

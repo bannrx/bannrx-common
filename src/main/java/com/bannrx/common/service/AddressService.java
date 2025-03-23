@@ -13,7 +13,9 @@ import rklab.utility.expectations.InvalidInputException;
 import rklab.utility.expectations.ServerException;
 import rklab.utility.utilities.ObjectMapperUtils;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Service
@@ -26,15 +28,17 @@ public class AddressService {
 
 
     @Transactional
-    public Address save(List<AddressDto> addressDtoList) throws ServerException {
+    public Set<Address> save(List<AddressDto> addressDtoList, User user) throws ServerException {
+        Set<Address> addresses = new HashSet<>();
 
-        for (var addressDto : addressDtoList) {
-            var retVal = ObjectMapperUtils.map(addressDto, Address.class);
-            retVal.setStatus(Status.ACTIVE);
-            return addressRepository.save(retVal);
+        for(var dto : addressDtoList){
+            var address = ObjectMapperUtils.map(dto, Address.class);
+            address.setStatus(Status.ACTIVE);
+            address.setUser(user);
+            address = addressRepository.save(address);
+            addresses.add(address);
         }
-        throw new ServerException("You can add only one address");
-
+        return addresses;
     }
 
     public String delete(String id) throws ServerException {

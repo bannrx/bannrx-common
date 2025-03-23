@@ -3,6 +3,7 @@ package com.bannrx.common.service;
 import com.bannrx.common.dtos.BankDetailsDto;
 import com.bannrx.common.enums.Status;
 import com.bannrx.common.persistence.entities.BankDetails;
+import com.bannrx.common.persistence.entities.User;
 import com.bannrx.common.repository.BankDetailsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,7 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 import rklab.utility.annotations.Loggable;
 import rklab.utility.expectations.ServerException;
 import rklab.utility.utilities.ObjectMapperUtils;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+
 
 
 @Service
@@ -18,17 +23,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BankDetailsService {
 
-    private final BankDetailsRepository bankDetailsRepository;;
+    private final BankDetailsRepository bankDetailsRepository;
 
     @Transactional
-    public BankDetails save(List<BankDetailsDto> bankDetailsDtoList) throws ServerException {
-
-        for(var bankDetailList : bankDetailsDtoList){
-            var retVal = ObjectMapperUtils.map(bankDetailList, BankDetails.class);
-            retVal.setStatus(Status.ACTIVE);
-            return bankDetailsRepository.save(retVal);
+    public Set<BankDetails> save(List<BankDetailsDto> bankDetailsDtoList, User user) throws ServerException {
+        Set<BankDetails> bankDetails = new HashSet<>();
+        for(var dto : bankDetailsDtoList){
+            var bankDetail = ObjectMapperUtils.map(dto, BankDetails.class);
+            bankDetail.setStatus(Status.ACTIVE);
+            bankDetail.setUser(user);
+            bankDetail = bankDetailsRepository.save(bankDetail);
+            bankDetails.add(bankDetail);
         }
-
-        throw new ServerException("Only one bank details you can add.");
+        return bankDetails;
     }
 }

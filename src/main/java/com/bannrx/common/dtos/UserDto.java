@@ -1,13 +1,15 @@
 package com.bannrx.common.dtos;
 
 import com.bannrx.common.persistence.entities.User;
-import com.bannrx.common.validationGroups.AddOrderValidationGroup;
+import com.bannrx.common.validationGroups.AddValidationGroup;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
-import java.util.List;
+
+import java.util.Set;
+
 import static rklab.utility.constants.GlobalConstants.RegexPattern.PHONE_NO_REGEX;
 
 
@@ -15,7 +17,7 @@ import static rklab.utility.constants.GlobalConstants.RegexPattern.PHONE_NO_REGE
 @NoArgsConstructor
 public class UserDto {
 
-    @NotEmpty(groups = AddOrderValidationGroup.class, message = "User Id is mandatory.")
+    @NotEmpty(groups = AddValidationGroup.class, message = "User Id is mandatory.")
     private String id;
 
     @NotBlank(message = "Name cannot be blank.")
@@ -33,12 +35,12 @@ public class UserDto {
     @NotNull(message = "Address list cannot be null.")
     @Size(min = 1, message = "At least one address is required.")
     @Valid
-    private List<AddressDto> addressDtoList;
+    private Set<AddressDto> addressDtoSet;
 
     @NotNull(message = "Bank details list cannot be null.")
     @Size(min = 1, message = "At least one bank detail is required.")
     @Valid
-    private List<BankDetailsDto> bankDetailsDtoList;
+    private Set<BankDetailsDto> bankDetailsDtoSet;
 
     @NotNull(message = "Business details cannot be null.")
     @Valid

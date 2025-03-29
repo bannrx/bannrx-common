@@ -37,4 +37,24 @@ public class BankDetailsService {
         }
         return bankDetails;
     }
+
+    public Set<BankDetails> toEntitySet(Set<BankDetailsDto> bankDetailsDtoSet, User user) throws ServerException {
+        Set<BankDetails> bankDetailsSet = new HashSet<>();
+        for(var dto : bankDetailsDtoSet){
+            var entity = ObjectMapperUtils.map(dto, BankDetails.class);
+            entity.setUser(user);
+            bankDetailsSet.add(entity);
+        }
+        return bankDetailsSet;
+    }
+
+    public Set<BankDetailsDto> toDto(Set<BankDetails> bankDetailSet) throws ServerException {
+        Set<BankDetailsDto> bankDetailsDtoSet = new HashSet<>();
+        for(var entity : bankDetailSet){
+            entity = bankDetailsRepository.save(entity);
+            var dto = ObjectMapperUtils.map(entity, BankDetailsDto.class);
+            bankDetailsDtoSet.add(dto);
+        }
+        return bankDetailsDtoSet;
+    }
 }

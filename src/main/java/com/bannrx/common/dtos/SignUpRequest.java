@@ -5,8 +5,7 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
+import java.util.Set;
 
 import static rklab.utility.constants.GlobalConstants.RegexPattern.PHONE_NO_REGEX;
 
@@ -37,12 +36,12 @@ public class SignUpRequest {
     @NotNull(message = "Address list cannot be null.")
     @Size(min = 1, message = "At least one address is required.")
     @Valid
-    private List<AddressDto> addressDtoList;
+    private Set<AddressDto> addressDtoSet;
 
     @NotNull(message = "Bank details list cannot be null.")
     @Size(min = 1, message = "At least one bank detail is required.")
     @Valid
-    private List<BankDetailsDto> bankDetailsDtoList;
+    private Set<BankDetailsDto> bankDetailsDtoSet;
 
     @NotNull(message = "Business details cannot be null.")
     @Valid

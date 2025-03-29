@@ -16,6 +16,7 @@ import rklab.utility.utilities.ObjectMapperUtils;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -76,5 +77,25 @@ public class AddressService {
     public Address fetchById(String addressId) throws InvalidInputException {
         return addressRepository.findById(addressId).
                 orElseThrow(()->new InvalidInputException("Address not found with id "+addressId));
+    }
+
+    public Set<Address> toEntitySet(Set<AddressDto> addressDtoSet, User user) throws ServerException {
+        Set<Address> addressSet = new HashSet<>();
+        for(var dto : addressDtoSet){
+            var entity = ObjectMapperUtils.map(dto, Address.class);
+            entity.setUser(user);
+            addressSet.add(entity);
+        }
+        return addressSet;
+    }
+
+    public Set<AddressDto> toDto(Set<Address> addresses) throws ServerException {
+        Set<AddressDto> addressDtoSet = new HashSet<>();
+        for(var entity : addresses){
+            entity = addressRepository.save(entity);
+            var dto = ObjectMapperUtils.map(entity, AddressDto.class);
+            addressDtoSet.add(dto);
+        }
+        return addressDtoSet;
     }
 }

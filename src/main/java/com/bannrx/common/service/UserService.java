@@ -17,11 +17,9 @@ import rklab.utility.annotations.Loggable;
 import rklab.utility.expectations.InvalidInputException;
 import rklab.utility.expectations.ServerException;
 import rklab.utility.utilities.ObjectMapperUtils;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 
 
 
@@ -39,38 +37,22 @@ public class UserService implements UserDetailsService {
     @Transactional
     public UserDto createUser(SignUpRequest request) throws ServerException {
         var user = ObjectMapperUtils.map(request, User.class);
+        var bankDetails = bankDetailsService.toEntitySet(request.getBankDetailsDtoSet(),user);
+        user.setBankDetails(bankDetails);
+        var addresses = addressService.toEntitySet(request.getAddressDtoSet(), user);
+        user.setAddresses(addresses);
+        var business = businessService.toEntity(request.getBusinessDto());
+        user.setBusiness(business);
         user = userRepository.save(user);
-
-        var savedAddressDetails = addressService.save(request.getAddressDtoList(), user);
-        if (savedAddressDetails == null || savedAddressDetails.isEmpty()) {
-            throw new ServerException("Failed to save address details.");
-        }
-
-        var savedBankDetails = bankDetailsService.save(request.getBankDetailsDtoList(), user);
-        if (savedBankDetails == null || savedBankDetails.isEmpty()) {
-            throw new ServerException("Failed to save bank details.");
-        }
-
-        var savedBusinessDetails = businessService.save(request.getBusinessDto());
-        if (savedBusinessDetails == null) {
-            throw new ServerException("Failed to save business details.");
-        }
-
-        user.addAddreses(new HashSet<>(savedAddressDetails));
-        user.addBankDetails(new HashSet<>(savedBankDetails));
-        user.setBusiness(savedBusinessDetails);
+        var userDto = ObjectMapperUtils.map(user, UserDto.class);
+        var bankDtoSet = bankDetailsService.toDto(user.getBankDetails());
+        var addressDtoSet = addressService.toDto(user.getAddresses());
+        var businessDto = businessService.toDto(user.getBusiness());
         user.setCreatedBy(user.getEmail());
         user.setModifiedBy(user.getEmail());
-
-        var userDto = ObjectMapperUtils.map(user, UserDto.class);
-        var addressDtos = getAddressDtos(savedAddressDetails);
-        var bankDtos = getBankDetailsDtoList(savedBankDetails);
-        var businessDto = ObjectMapperUtils.map(savedBusinessDetails, BusinessDto.class);
-
-        userDto.setAddressDtoList(addressDtos);
-        userDto.setBankDetailsDtoList(bankDtos);
+        userDto.setAddressDtoSet(addressDtoSet);
+        userDto.setBankDetailsDtoSet(bankDtoSet);
         userDto.setBusinessDto(businessDto);
-
         return userDto;
     }
 

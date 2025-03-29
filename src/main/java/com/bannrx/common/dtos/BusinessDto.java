@@ -1,7 +1,8 @@
 package com.bannrx.common.dtos;
 
 import com.bannrx.common.enums.BusinessType;
-import com.bannrx.common.validationGroups.AddOrderValidationGroup;
+import com.bannrx.common.validationGroups.AddValidationGroup;
+import com.bannrx.common.validationGroups.UpdateValidationGroup;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class BusinessDto {
 
-    @NotEmpty(groups = AddOrderValidationGroup.class, message = "Business Id is mandatory.")
+    @NotEmpty(groups = UpdateValidationGroup.class, message = "Business Id is mandatory.")
     private String id;
 
     @NotBlank(message = "Business name cannot be blank.")

@@ -4,7 +4,6 @@ import com.bannrx.common.dtos.BusinessDto;
 import com.bannrx.common.enums.BusinessType;
 import com.bannrx.common.enums.Status;
 import com.bannrx.common.persistence.entities.Business;
-import com.bannrx.common.persistence.entities.User;
 import com.bannrx.common.repository.BusinessRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,5 +24,14 @@ public class BusinessService {
         business.setStatus(Status.ACTIVE);
         business.setType(BusinessType.FOOD_AND_BEVERAGE);
         return businessRepository.save(business);
+    }
+
+    public Business toEntity(BusinessDto businessDto) throws ServerException {
+        return ObjectMapperUtils.map(businessDto, Business.class);
+    }
+
+    public BusinessDto toDto(Business business) throws ServerException {
+        var entity = businessRepository.save(business);
+        return ObjectMapperUtils.map(entity, BusinessDto.class);
     }
 }

@@ -12,6 +12,8 @@ import rklab.utility.utilities.JsonUtils;
 @Entity
 @Data
 @Table
+@AllArgsConstructor
+@NoArgsConstructor
 public class Address extends Persist {
 
     @Column(name = "address_line1")

@@ -1,11 +1,13 @@
 package com.bannrx.common.securityfilters;
 
+import com.bannrx.common.service.AuthTokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.bannrx.common.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +25,7 @@ import java.util.Objects;
 public class AuthorizationFilter extends OncePerRequestFilter {
 
     private final UserService userService;
+    private final AuthTokenService authTokenService;
     private final JWTService jwtService;
     private final JwtConfiguration jwtConfiguration;
 
@@ -39,9 +42,16 @@ public class AuthorizationFilter extends OncePerRequestFilter {
             token = authHeader.substring(TOKEN_START_INDEX);
         }
         if (Objects.nonNull(token) && Objects.isNull(SecurityContextHolder.getContext().getAuthentication())){
+            var tokenActive = jwtService.isActive(token, jwtConfiguration);
             var userId = jwtService.extractUsername(token, jwtConfiguration);
-            var userMyBe = userService.getById(userId);
-            userMyBe.ifPresent(user -> setSecurityContextHolder(request, user));
+            var user = userService.getById(userId)
+                    .orElseThrow(() -> new AccessDeniedException("Invalid token"));
+            if (tokenActive){
+                setSecurityContextHolder(request, user);
+            } else {
+                authTokenService.deactivate(user.getAuthToken());
+                throw new AccessDeniedException("Token Expired. Please re-login.");
+            }
         }
         filterChain.doFilter(request, response);
     }

@@ -30,7 +30,7 @@ public class BankDetailsService {
         Set<BankDetails> bankDetails = new HashSet<>();
         for(var dto : bankDetailsDtoList){
             var bankDetail = ObjectMapperUtils.map(dto, BankDetails.class);
-            bankDetail.setStatus(Status.ACTIVE);
+            bankDetail.setActive(true);
             bankDetail.setUser(user);
             bankDetail = bankDetailsRepository.save(bankDetail);
             bankDetails.add(bankDetail);
@@ -38,11 +38,10 @@ public class BankDetailsService {
         return bankDetails;
     }
 
-    public Set<BankDetails> toEntitySet(Set<BankDetailsDto> bankDetailsDtoSet, User user) throws ServerException {
+    public Set<BankDetails> toEntitySet(Set<BankDetailsDto> bankDetailsDtoSet) throws ServerException {
         Set<BankDetails> bankDetailsSet = new HashSet<>();
         for(var dto : bankDetailsDtoSet){
             var entity = ObjectMapperUtils.map(dto, BankDetails.class);
-            entity.setUser(user);
             bankDetailsSet.add(entity);
         }
         return bankDetailsSet;

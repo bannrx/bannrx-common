@@ -18,9 +18,8 @@ public abstract class Persist {
     @Id
     private String id;
 
-    @Column(name = "status")
-    @Enumerated(EnumType.STRING)
-    private Status status;
+    @Column(name = "active")
+    private boolean active;
 
     @Column(name = "created_at", nullable = false)
     private Date createdAt;
@@ -43,22 +42,20 @@ public abstract class Persist {
         if (StringUtils.isBlank(this.createdBy)){
             this.setCreatedBy(getLoggedInUserEmail());
         }
-        if (Objects.isNull(this.status)){
-            status = Status.ACTIVE;
-        }
+        this.active = true;
         onPreUpdate();
     }
 
     @PreUpdate
     public void onPreUpdate(){
         this.setModifiedAt(new Date());
-        this.setModifiedBy(setDefaultModifiedBy());
+        if (StringUtils.isBlank(this.modifiedBy)){
+            this.setModifiedBy(setDefaultModifiedBy());
+        }
     }
 
     /**
      * Fetches the logged-in user id.
-     * This is yet to be built.
-     * If not found should return null.
      *
      * @return logged in user id
      */
@@ -66,10 +63,10 @@ public abstract class Persist {
         var principle = SecurityUtils.getLoggedInUser();
         if (principle instanceof User user)
             return user.getEmail();
-        return "default";
+        return null;
     }
 
-    public String setDefaultModifiedBy(){
+    protected String setDefaultModifiedBy(){
         return getLoggedInUserEmail();
     }
 

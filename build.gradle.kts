@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.bannrx"
-version = "addUser-0.0.1-SNAPSHOT"
+version = "common-0.0.2-SNAPSHOT"
 
 java {
 	toolchain {
@@ -52,7 +52,7 @@ publishing {
 
 repositories {
 	mavenCentral()
-	var env = project.findProperty("environment") as String? ?: System.getenv("ENVIRONMENT")
+	val env = project.findProperty("environment") as String? ?: System.getenv("ENVIRONMENT")
 	if (env != "local"){
 		val user: String? = project.findProperty("utility-username") as String? ?: System.getenv("GITHUB_USERNAME")
 		val token: String? = project.findProperty("utility-token") as String? ?: System.getenv("GITHUB_TOKEN")
@@ -83,11 +83,11 @@ dependencies {
 
 
 	//added
-	var env = project.findProperty("environment") as String? ?: System.getenv("ENVIRONMENT")
+	val env = project.findProperty("environment") as String? ?: System.getenv("ENVIRONMENT")
 	if (env == "local"){
 		implementation(project(":utility"))
 	} else {
-		implementation("com.rklab:utility:addUser-0.0.1-SNAPSHOT")
+		implementation("com.rklab:utility:utility-0.0.2-SNAPSHOT")
 	}
 	implementation("org.springframework.boot:spring-boot-starter-security:3.1.0")
 	implementation("org.springframework.security:spring-security-config:6.0.0")
@@ -100,6 +100,9 @@ dependencies {
 	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.2")
 	testImplementation("org.mockito:mockito-core:5.14.2")
 	testImplementation("org.mockito:mockito-junit-jupiter:5.14.2")
+	implementation("org.mapstruct:mapstruct:1.5.5.Final")
+	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
+	implementation("org.apache.commons:commons-collections4:4.4")
 
 }
 

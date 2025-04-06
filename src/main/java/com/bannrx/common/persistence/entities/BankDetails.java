@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import rklab.utility.utilities.JsonUtils;
 
 
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = "user")
 @Entity
 @Data
 @AllArgsConstructor

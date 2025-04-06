@@ -34,7 +34,7 @@ public class AddressService {
 
         for(var dto : addressDtoList){
             var address = ObjectMapperUtils.map(dto, Address.class);
-            address.setStatus(Status.ACTIVE);
+            address.setActive(true);
             address.setUser(user);
             address = addressRepository.save(address);
             addresses.add(address);
@@ -79,11 +79,10 @@ public class AddressService {
                 orElseThrow(()->new InvalidInputException("Address not found with id "+addressId));
     }
 
-    public Set<Address> toEntitySet(Set<AddressDto> addressDtoSet, User user) throws ServerException {
+    public Set<Address> toEntitySet(Set<AddressDto> addressDtoSet) throws ServerException {
         Set<Address> addressSet = new HashSet<>();
         for(var dto : addressDtoSet){
             var entity = ObjectMapperUtils.map(dto, Address.class);
-            entity.setUser(user);
             addressSet.add(entity);
         }
         return addressSet;

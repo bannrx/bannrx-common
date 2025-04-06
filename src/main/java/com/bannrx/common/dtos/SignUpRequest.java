@@ -3,6 +3,7 @@ import com.bannrx.common.enums.UserRole;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.Set;
@@ -13,6 +14,7 @@ import static rklab.utility.constants.GlobalConstants.RegexPattern.PHONE_NO_REGE
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class SignUpRequest {
     @NotBlank(message = "Name cannot be blank.")
     @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters.")

@@ -17,9 +17,16 @@ import java.util.List;
 
 
 
-@EqualsAndHashCode(callSuper = true, exclude = {"addresses", "bankDetails", "business"})
+@EqualsAndHashCode(callSuper = true, exclude = {"addresses", "bankDetails", "business", "authToken"})
 @Data
 @Entity
+@Table (
+        name = "user",
+        indexes = {
+                @Index(name = "idx_user_email", columnList = "email"),
+                @Index(name = "idx_user_phone", columnList = "phone_no")
+        }
+)
 public class User extends Persist implements UserDetails {
 
     @Column(name = "name", nullable = false)
@@ -32,6 +39,7 @@ public class User extends Persist implements UserDetails {
     private String email;
 
     @Column(name = "password", nullable = false)
+    @JsonIgnore
     private String password;
 
     @Column(name = "role")
@@ -50,8 +58,12 @@ public class User extends Persist implements UserDetails {
     @JoinColumn(name = "business_id")
     private Business business;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "auth_token_id", referencedColumnName = "id")
+    private AuthToken authToken;
+
     @Override
-    public String setDefaultModifiedBy(){
+    protected String setDefaultModifiedBy(){
         var retVal = super.setDefaultModifiedBy();
         if (StringUtils.isBlank(retVal)){
             retVal = this.email;
@@ -60,20 +72,13 @@ public class User extends Persist implements UserDetails {
     }
 
     @JsonIgnore
-    public void addAddreses(Set<Address> addresses) throws ServerException {
-
-        if (addresses == null) {
-            throw new ServerException("Addresses should not be null.");
-        }
-
-        if (this.addresses == null) {
-            this.addresses = new HashSet<>();
-        }
-
-        this.addresses.clear();
-        for (var address : addresses) {
-            this.addresses.add(address);
+    public void appendAddress(Address address) {
+        if (Objects.nonNull(address)){
+            var existing = Optional.ofNullable(this.getAddresses())
+                    .orElse(new LinkedHashSet<>());
             address.setUser(this);
+            existing.add(address);
+            this.setAddresses(existing);
         }
     }
 
@@ -84,20 +89,13 @@ public class User extends Persist implements UserDetails {
     }
 
     @JsonIgnore
-    public void addBankDetails(Set<BankDetails> bankDetails) throws ServerException {
-
-        if(bankDetails == null){
-           throw new ServerException("Bank details should not be null");
-        }
-
-        if (this.bankDetails == null) {
-            this.bankDetails = new HashSet<>();
-        }
-
-        this.bankDetails.clear();
-        for (var bankDetail : bankDetails) {
-            this.bankDetails.add(bankDetail);
-            bankDetail.setUser(this);
+    public void appendBankDetail(BankDetails bankDetails) {
+        if (Objects.nonNull(bankDetails)){
+            var existing = Optional.ofNullable(this.getBankDetails())
+                    .orElse(new LinkedHashSet<>());
+            bankDetails.setUser(this);
+            existing.add(bankDetails);
+            this.setBankDetails(existing);
         }
     }
 

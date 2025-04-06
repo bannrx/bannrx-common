@@ -21,7 +21,7 @@ public class BusinessService {
 
     public Business save(BusinessDto businessDto) throws ServerException {
         var business = ObjectMapperUtils.map(businessDto, Business.class);
-        business.setStatus(Status.ACTIVE);
+        business.setActive(true);
         business.setType(BusinessType.FOOD_AND_BEVERAGE);
         return businessRepository.save(business);
     }

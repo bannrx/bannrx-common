@@ -100,6 +100,9 @@ dependencies {
 	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.2")
 	testImplementation("org.mockito:mockito-core:5.14.2")
 	testImplementation("org.mockito:mockito-junit-jupiter:5.14.2")
+	implementation("org.mapstruct:mapstruct:1.5.5.Final")
+	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
+	implementation("org.apache.commons:commons-collections4:4.4")
 
 }
 

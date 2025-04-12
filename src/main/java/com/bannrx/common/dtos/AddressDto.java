@@ -1,6 +1,7 @@
 package com.bannrx.common.dtos;
 
 import com.bannrx.common.validationGroups.AddValidationGroup;
+import com.bannrx.common.validationGroups.AvailableValidationGroup;
 import com.bannrx.common.validationGroups.UpdateValidationGroup;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -32,7 +33,8 @@ public class AddressDto {
     @NotBlank(message = "State cannot be empty")
     private String state;
 
-    @Pattern(regexp = PIN_CODE_REGEX, message = "Invalid PIN code. Must be a 6-digit number starting with 1-9.")
+    @Pattern(regexp = PIN_CODE_REGEX, message = "Invalid PIN code. Must be a 6-digit number starting with 1-9."
+            , groups = AvailableValidationGroup.class)
     @NotBlank(message = "PIN code cannot be empty")
     private String pincode;
 

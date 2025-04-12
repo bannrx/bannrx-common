@@ -1,6 +1,7 @@
 package com.bannrx.common.test;
 
 import com.bannrx.common.dtos.*;
+import com.bannrx.common.dtos.requests.SignUpRequest;
 import com.bannrx.common.enums.BusinessType;
 import com.bannrx.common.enums.UserRole;
 import com.bannrx.common.persistence.entities.Address;

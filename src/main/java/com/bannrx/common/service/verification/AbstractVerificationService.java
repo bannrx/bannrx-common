@@ -62,7 +62,7 @@ public abstract class AbstractVerificationService {
     }
 
     protected String getVerifiedBy() throws InvalidInputException {
-        return userService.getLoggedInUser().getEmail();
+        return userService.fetchLoggedInUser().getEmail();
     }
 
     /**

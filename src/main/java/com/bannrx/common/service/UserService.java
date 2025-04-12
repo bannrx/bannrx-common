@@ -2,10 +2,14 @@ package com.bannrx.common.service;
 
 import com.bannrx.common.dtos.*;
 import com.bannrx.common.dtos.UserDto;
+import com.bannrx.common.dtos.requests.SignUpRequest;
+import com.bannrx.common.dtos.responses.PageableResponse;
 import com.bannrx.common.persistence.entities.Address;
 import com.bannrx.common.persistence.entities.BankDetails;
 import com.bannrx.common.persistence.entities.User;
 import com.bannrx.common.repository.UserRepository;
+import com.bannrx.common.searchCriteria.UserSearchCriteria;
+import com.bannrx.common.specifications.UserSpecification;
 import com.bannrx.common.utilities.SecurityUtils;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
@@ -21,6 +25,8 @@ import rklab.utility.expectations.InvalidInputException;
 import rklab.utility.expectations.ServerException;
 import rklab.utility.utilities.IdGenerator;
 import rklab.utility.utilities.ObjectMapperUtils;
+import rklab.utility.utilities.PageableUtils;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -187,6 +193,38 @@ public class UserService implements UserDetailsService {
         userRepository.delete(user.get());
     }
 
+    /**
+     * Fetch pageable response.
+     *
+     * @param searchCriteria the user search criteria
+     * @return the pageable response
+     */
+    public PageableResponse<UserDto> fetch(UserSearchCriteria searchCriteria){
+        var pageable = PageableUtils.createPageable(searchCriteria);
+        searchCriteria.setLoggedInUserId(getLoggedInUserId());
+        var userPage = userRepository.findAll(
+                UserSpecification.buildSearchCriteria(searchCriteria),
+                pageable
+        );
+        var userList = userPage.getContent().stream()
+                .map(this::getUserDto)
+                .filter(Objects::nonNull)
+                .toList();
+        return new PageableResponse<>(userList, searchCriteria);
+    }
+
+    /**
+     * below method ignores the error.
+     *
+     */
+    private UserDto getUserDto(User user){
+        try{
+            return toDto(user);
+        } catch (ServerException e) {
+            return null;
+        }
+    }
+
 
     /**
      * Below goes all the database interaction logics
@@ -285,13 +323,22 @@ public class UserService implements UserDetailsService {
      *
      * @return user
      */
-    public User getLoggedInUser() throws InvalidInputException {
+    public User fetchLoggedInUser() throws InvalidInputException {
         var userMayBe = Optional.ofNullable(SecurityUtils.getLoggedInUser());
         if (userMayBe.isPresent() &&
             userMayBe.get() instanceof SecurityUserDto user){
             return fetchById(user.getId());
         }
         throw new InvalidInputException("Error while getting User from security context.");
+    }
+
+    private String getLoggedInUserId(){
+        var userMayBe = Optional.ofNullable(SecurityUtils.getLoggedInUser());
+        if (userMayBe.isPresent() &&
+                userMayBe.get() instanceof SecurityUserDto user){
+            return user.getId();
+        }
+        return null;
     }
 
     @Override

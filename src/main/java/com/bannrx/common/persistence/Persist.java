@@ -1,6 +1,6 @@
 package com.bannrx.common.persistence;
 
-import com.bannrx.common.enums.Status;
+import com.bannrx.common.dtos.SecurityUserDto;
 import com.bannrx.common.persistence.entities.User;
 import com.bannrx.common.utilities.SecurityUtils;
 import jakarta.persistence.*;
@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import rklab.utility.utilities.IdGenerator;
 
 import java.util.Date;
-import java.util.Objects;
 
 @Data
 @MappedSuperclass
@@ -40,7 +39,7 @@ public abstract class Persist {
         }
         this.setCreatedAt(new Date());
         if (StringUtils.isBlank(this.createdBy)){
-            this.setCreatedBy(getLoggedInUserEmail());
+            this.setCreatedBy(getLoggedInUserId());
         }
         this.active = true;
         onPreUpdate();
@@ -59,15 +58,15 @@ public abstract class Persist {
      *
      * @return logged in user id
      */
-    private String getLoggedInUserEmail(){
+    private String getLoggedInUserId(){
         var principle = SecurityUtils.getLoggedInUser();
-        if (principle instanceof User user)
-            return user.getEmail();
+        if (principle instanceof SecurityUserDto user)
+            return user.getId();
         return null;
     }
 
     protected String setDefaultModifiedBy(){
-        return getLoggedInUserEmail();
+        return getLoggedInUserId();
     }
 
     public abstract String getPrefix();

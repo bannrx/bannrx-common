@@ -1,4 +1,7 @@
-package com.bannrx.common.dtos;
+package com.bannrx.common.dtos.requests;
+import com.bannrx.common.dtos.AddressDto;
+import com.bannrx.common.dtos.BankDetailsDto;
+import com.bannrx.common.dtos.BusinessDto;
 import com.bannrx.common.enums.UserRole;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;

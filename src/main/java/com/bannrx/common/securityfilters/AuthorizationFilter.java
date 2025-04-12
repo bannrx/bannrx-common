@@ -1,5 +1,6 @@
 package com.bannrx.common.securityfilters;
 
+import com.bannrx.common.dtos.SecurityUserDto;
 import com.bannrx.common.service.AuthTokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -47,7 +48,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
             var user = userService.getById(userId)
                     .orElseThrow(() -> new AccessDeniedException("Invalid token"));
             if (tokenActive){
-                setSecurityContextHolder(request, user);
+                setSecurityContextHolder(request, new SecurityUserDto(user));
             } else {
                 authTokenService.deactivate(user.getAuthToken());
                 throw new AccessDeniedException("Token Expired. Please re-login.");

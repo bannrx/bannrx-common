@@ -1,4 +1,4 @@
-package com.bannrx.common.dtos;
+package com.bannrx.common.dtos.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

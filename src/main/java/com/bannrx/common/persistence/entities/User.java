@@ -27,7 +27,7 @@ import java.util.List;
                 @Index(name = "idx_user_phone", columnList = "phone_no")
         }
 )
-public class User extends Persist implements UserDetails {
+public class User extends Persist {
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -47,19 +47,23 @@ public class User extends Persist implements UserDetails {
     private UserRole role;
 
     @JsonManagedReference
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Address> addresses = new HashSet<>();
 
     @JsonManagedReference
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<BankDetails> bankDetails = new HashSet<>();
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "business_id")
+    @JsonIgnore
     private Business business;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "auth_token_id", referencedColumnName = "id")
+    @JsonIgnore
     private AuthToken authToken;
 
     @Override
@@ -113,41 +117,5 @@ public class User extends Persist implements UserDetails {
 
     public String toString(){
         return JsonUtils.jsonOf(this);
-    }
-
-    @Override
-    @JsonIgnore
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
-    }
-
-    @Override
-    @JsonIgnore
-    public String getUsername() {
-        return this.getId();
-    }
-
-    @Override
-    @JsonIgnore
-    public boolean isAccountNonExpired() {
-        return false;
-    }
-
-    @Override
-    @JsonIgnore
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    @JsonIgnore
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    @JsonIgnore
-    public boolean isEnabled() {
-        return true;
     }
 }

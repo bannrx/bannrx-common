@@ -43,10 +43,7 @@ public class AddressDto {
     private Double longitude;
     
     public boolean isAddressLine2Equal(String addressLine2){
-        if(addressLine2==null || this.addressLine2.equalsIgnoreCase(addressLine2)){
-            return true;
-        }
-        return false;
+        return addressLine2 == null || this.addressLine2.equalsIgnoreCase(addressLine2);
     }
 
 }

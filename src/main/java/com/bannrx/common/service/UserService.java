@@ -9,6 +9,7 @@ import com.bannrx.common.repository.UserRepository;
 import com.bannrx.common.utilities.SecurityUtils;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import rklab.utility.annotations.Loggable;
 import rklab.utility.expectations.InvalidInputException;
 import rklab.utility.expectations.ServerException;
+import rklab.utility.utilities.IdGenerator;
 import rklab.utility.utilities.ObjectMapperUtils;
 import java.util.List;
 import java.util.Objects;
@@ -48,8 +50,13 @@ public class UserService implements UserDetailsService {
     @Transactional
     public UserDto signUp(SignUpRequest request) throws ServerException {
         var user = toEntity(request);
+        user.setId(user.getPrefix().concat(IdGenerator.generateId()));
         setUpCreatedByAndModifiedBy(user);
         user = userRepository.save(user);
+        return toDto(user);
+    }
+
+    private UserDto toDto(User user) throws ServerException {
         var userDto = ObjectMapperUtils.map(user, UserDto.class);
         var bankDtoSet = bankDetailsService.toDto(user.getBankDetails());
         var addressDtoSet = addressService.toDto(user.getAddresses());
@@ -80,25 +87,25 @@ public class UserService implements UserDetailsService {
      * @param user signing up user
      */
     private void setUpCreatedByAndModifiedBy(User user){
-        var email = user.getEmail();
-        user.setCreatedBy(email);
-        user.setModifiedBy(email);
+        var id = user.getId();
+        user.setCreatedBy(id);
+        user.setModifiedBy(id);
         if (CollectionUtils.isNotEmpty(user.getAddresses())){
             user.getAddresses().forEach(address -> {
-                address.setCreatedBy(email);
-                address.setModifiedBy(email);
+                address.setCreatedBy(id);
+                address.setModifiedBy(id);
             });
         }
         if (CollectionUtils.isNotEmpty(user.getBankDetails())){
             user.getBankDetails().forEach(bankDetails -> {
-                bankDetails.setCreatedBy(email);
-                bankDetails.setModifiedBy(email);
+                bankDetails.setCreatedBy(id);
+                bankDetails.setModifiedBy(id);
             });
         }
         if (Objects.nonNull(user.getBusiness())){
             var business = user.getBusiness();
-            business.setCreatedBy(email);
-            business.setModifiedBy(email);
+            business.setCreatedBy(id);
+            business.setModifiedBy(id);
         }
     }
 
@@ -132,9 +139,47 @@ public class UserService implements UserDetailsService {
 
     public UserDto update(UserDto userDto) throws ServerException, InvalidInputException {
         User user = fetchById(userDto.getId());
+        validateUpdateRequest(userDto, user);
         ObjectMapperUtils.map(userDto,user);
         user = userRepository.save(user);
-        return ObjectMapperUtils.map(user,UserDto.class);
+        return toDto(user);
+    }
+
+    private void validateUpdateRequest(final UserDto userDto, final User user) throws InvalidInputException {
+        if (
+                StringUtils.isBlank(userDto.getName()) &&
+                        StringUtils.isBlank(userDto.getPassword()) &&
+                        StringUtils.isBlank(userDto.getPhoneNo()) &&
+                        StringUtils.isBlank(userDto.getEmail())
+        ){
+            throw new InvalidInputException("No changes found.");
+        }
+        validateUpdatePhoneNo(userDto, user);
+        validateUpdateEmail(userDto, user);
+    }
+
+    private void validateUpdatePhoneNo(final UserDto userDto, final User user) throws InvalidInputException {
+        if (StringUtils.isNotBlank(userDto.getPhoneNo())){
+            if (StringUtils.equals(userDto.getPhoneNo(), user.getPhoneNo())){
+                throw new InvalidInputException("Phone no didn't changed. Please provide updated details only.");
+            }
+            var exists = existingContactNo(userDto.getPhoneNo());
+            if (exists){
+                throw new InvalidInputException("User already exists with the phone no "+userDto.getPhoneNo());
+            }
+        }
+    }
+
+    private void validateUpdateEmail(final UserDto userDto, final User user) throws InvalidInputException {
+        if (StringUtils.isNotBlank(userDto.getEmail())){
+            if (StringUtils.equals(userDto.getEmail(), user.getEmail())){
+                throw new InvalidInputException("Email didn't changed. Please provide updated details only.");
+            }
+            var exists = existingEmail(userDto.getEmail());
+            if (exists){
+                throw new InvalidInputException("User already exists with the email "+userDto.getEmail());
+            }
+        }
     }
 
     public void delete(String phoneNo) {
@@ -198,11 +243,23 @@ public class UserService implements UserDetailsService {
                 );
     }
 
+    /**
+     * Existing contact no boolean.
+     *
+     * @param phoneNo the phone no
+     * @return the boolean
+     */
     public boolean existingContactNo(String phoneNo){
         Optional<User> userMayBe = userRepository.findByPhoneNo(phoneNo);
         return userMayBe.isPresent();
     }
 
+    /**
+     * Existing email boolean.
+     *
+     * @param email the email
+     * @return the boolean
+     */
     public boolean existingEmail(String email){
         Optional<User> userMayBe = userRepository.findByEmail(email);
         return userMayBe.isPresent();
@@ -231,7 +288,7 @@ public class UserService implements UserDetailsService {
     public User getLoggedInUser() throws InvalidInputException {
         var userMayBe = Optional.ofNullable(SecurityUtils.getLoggedInUser());
         if (userMayBe.isPresent() &&
-            userMayBe.get() instanceof User user){
+            userMayBe.get() instanceof SecurityUserDto user){
             return fetchById(user.getId());
         }
         throw new InvalidInputException("Error while getting User from security context.");
@@ -241,7 +298,7 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         var userMayBe = getById(username);
         if (userMayBe.isPresent()){
-            return userMayBe.get();
+            return new SecurityUserDto(userMayBe.get());
         }
         throw new UsernameNotFoundException("User not found");
     }

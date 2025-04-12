@@ -1,5 +1,6 @@
 package com.bannrx.common.service;
 
+import com.bannrx.common.dtos.SecurityUserDto;
 import com.bannrx.common.enums.TokenStatus;
 import com.bannrx.common.persistence.entities.AuthToken;
 import com.bannrx.common.persistence.entities.User;
@@ -91,7 +92,7 @@ public class AuthTokenService {
     }
 
     private String generateToken(User user) {
-        return jwtService.generateToken(configuration, user);
+        return jwtService.generateToken(configuration, new SecurityUserDto(user));
     }
 
     private boolean isActiveToken(String token){

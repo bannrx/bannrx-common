@@ -1,7 +1,6 @@
 package com.bannrx.common.service;
 
 import com.bannrx.common.dtos.AddressDto;
-import com.bannrx.common.enums.Status;
 import com.bannrx.common.persistence.entities.Address;
 import com.bannrx.common.persistence.entities.User;
 import com.bannrx.common.repository.AddressRepository;
@@ -9,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rklab.utility.annotations.Loggable;
+import com.bannrx.common.dtos.BDAUserExcelDto;
 import rklab.utility.expectations.InvalidInputException;
 import rklab.utility.expectations.ServerException;
 import rklab.utility.utilities.ObjectMapperUtils;
@@ -16,7 +16,6 @@ import rklab.utility.utilities.ObjectMapperUtils;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -96,5 +95,18 @@ public class AddressService {
             addressDtoSet.add(dto);
         }
         return addressDtoSet;
+    }
+
+    public Address toEntity(BDAUserExcelDto bdaUser, User user) {
+        var address = new Address();
+        address.setActive(true);
+        address.setAddressLine1(bdaUser.getAddressLine1());
+        address.setCity(bdaUser.getCity());
+        address.setState(bdaUser.getState());
+        address.setPinCode(bdaUser.getPinCode());
+        address.setCreatedBy(bdaUser.getEmail());
+        address.setModifiedBy(bdaUser.getEmail());
+        address.setUser(user);
+        return address;
     }
 }

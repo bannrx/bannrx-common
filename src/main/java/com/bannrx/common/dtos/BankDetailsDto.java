@@ -19,8 +19,8 @@ public class BankDetailsDto {
     @NotEmpty(groups = UpdateValidationGroup.class, message = "Bank Details Id is mandatory.")
     private String id;
 
-    @NotNull(message = "Account number cannot be null")
-    private Long accountNo;
+    @NotEmpty(message = "Account number cannot be null")
+    private String accountNo;
 
     @NotEmpty(message = "IFSC code cannot be blank")
     @Size(min = 11, max = 11, message = "IFSC code must be 11 characters long")

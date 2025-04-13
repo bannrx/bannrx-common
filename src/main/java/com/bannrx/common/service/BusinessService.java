@@ -11,6 +11,8 @@ import rklab.utility.annotations.Loggable;
 import rklab.utility.expectations.ServerException;
 import rklab.utility.utilities.ObjectMapperUtils;
 
+import java.util.Objects;
+
 
 @Service
 @Loggable
@@ -31,7 +33,9 @@ public class BusinessService {
     }
 
     public BusinessDto toDto(Business business) throws ServerException {
-        var entity = businessRepository.save(business);
-        return ObjectMapperUtils.map(entity, BusinessDto.class);
+        if (Objects.nonNull(business)){
+            return ObjectMapperUtils.map(business, BusinessDto.class);
+        }
+        return null;
     }
 }

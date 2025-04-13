@@ -1,15 +1,16 @@
 package com.bannrx.common.dtos.responses;
 
-import com.bannrx.common.dtos.BDAUserExcelDto;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import rklab.utility.dto.InvalidExcelRecordDto;
+import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.Set;
 
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class BDAResponse {
-    private List<String> createdUserId;
-    private List<BDAUserExcelDto> bdaUserExcelDtoList;
-    private List<InvalidExcelRecordDto> invalidExcelRecordDtoList;
+    private Set<String> userIds;
+    private Set<String> errorCases;
 }

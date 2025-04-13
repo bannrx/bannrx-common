@@ -5,6 +5,7 @@ import com.bannrx.common.persistence.entities.Address;
 import com.bannrx.common.persistence.entities.User;
 import com.bannrx.common.repository.AddressRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rklab.utility.annotations.Loggable;
@@ -88,13 +89,15 @@ public class AddressService {
     }
 
     public Set<AddressDto> toDto(Set<Address> addresses) throws ServerException {
-        Set<AddressDto> addressDtoSet = new HashSet<>();
-        for(var entity : addresses){
-            entity = addressRepository.save(entity);
-            var dto = ObjectMapperUtils.map(entity, AddressDto.class);
-            addressDtoSet.add(dto);
+        if (CollectionUtils.isNotEmpty(addresses)){
+            Set<AddressDto> addressDtoSet = new HashSet<>();
+            for(var entity : addresses){
+                var dto = ObjectMapperUtils.map(entity, AddressDto.class);
+                addressDtoSet.add(dto);
+            }
+            return addressDtoSet;
         }
-        return addressDtoSet;
+        return null;
     }
 
     public Address toEntity(BDAUserExcelDto bdaUser, User user) {

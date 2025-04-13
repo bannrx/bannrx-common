@@ -4,7 +4,7 @@ import com.bannrx.common.dtos.*;
 import com.bannrx.common.dtos.UserDto;
 import com.bannrx.common.dtos.requests.SignUpRequest;
 import com.bannrx.common.dtos.responses.PageableResponse;
-import com.bannrx.common.enums.UserRole;
+import com.bannrx.common.mappers.UserDetailsMapper;
 import com.bannrx.common.persistence.entities.Address;
 import com.bannrx.common.persistence.entities.BankDetails;
 import com.bannrx.common.persistence.entities.User;
@@ -25,20 +25,18 @@ import org.springframework.web.multipart.MultipartFile;
 import rklab.utility.annotations.Loggable;
 import com.bannrx.common.dtos.responses.BDAResponse;
 import com.bannrx.common.dtos.BDAUserExcelDto;
+import rklab.utility.dto.InvalidExcelRecordDto;
 import rklab.utility.expectations.InvalidInputException;
 import rklab.utility.expectations.ServerException;
+import rklab.utility.utilities.ExcelUtils;
 import rklab.utility.utilities.IdGenerator;
-import com.bannrx.common.utilities.ExcelUtil;
 import rklab.utility.utilities.ObjectMapperUtils;
 import rklab.utility.utilities.PageableUtils;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
-
+import static com.bannrx.common.enums.UserRole.ROLE_BDA;
 
 
 @Service
@@ -221,6 +219,31 @@ public class UserService implements UserDetailsService {
         return new PageableResponse<>(userList, searchCriteria);
     }
 
+
+
+    @Transactional
+    public BDAResponse createBDAUser(MultipartFile file, int sheetNo) throws IOException {
+        var excelParseData = ExcelUtils.validateAndParseToDto(file.getInputStream(), BDAUserExcelDto.class, sheetNo);
+        var userIdSet = new LinkedHashSet<String>();
+        for(var bdaUser : excelParseData.getParsedDtoSet()){
+            var user = UserDetailsMapper.INSTANCE.toEntity(bdaUser, "bannrx123", ROLE_BDA);
+            var bankDetails = Set.of(UserDetailsMapper.INSTANCE.toEntity(bdaUser, true));
+            var addresses = Set.of(UserDetailsMapper.INSTANCE.toEntity(bdaUser));
+            bankDetails.forEach(user::appendBankDetail);
+            addresses.forEach(user::appendAddress);
+            user = userRepository.save(user);
+            userIdSet.add(user.getId());
+        }
+        var errorCasesSet = excelParseData.getInvalidExcelRecordDtoList().stream()
+                .map(InvalidExcelRecordDto::toString)
+                .collect(Collectors.toSet());
+        return new BDAResponse(userIdSet, errorCasesSet);
+    }
+
+    /**
+     * Below goes all the database interaction logics
+     */
+
     /**
      * below method ignores the error.
      *
@@ -233,10 +256,6 @@ public class UserService implements UserDetailsService {
         }
     }
 
-
-    /**
-     * Below goes all the database interaction logics
-     */
 
     /**
      * Fetch by id user.
@@ -368,31 +387,4 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
-
-    @Transactional
-    public BDAResponse createBDAUser(MultipartFile file, int sheetNo) throws IOException, ServerException {
-        BDAResponse bdaResponse = ExcelUtil.validateAndParseToExcel(file.getInputStream(), BDAUserExcelDto.class, sheetNo);
-        List<String> userId = new ArrayList<>();
-        for(var bdaUser : bdaResponse.getBdaUserExcelDtoList()){
-            var user = ObjectMapperUtils.map(bdaUser, User.class);
-            user.setPassword("string");
-            var bankDetails = bankDetailsService.toEntity(bdaUser, user);
-            user.setBankDetails(Set.of(bankDetails));
-            
-            var address = addressService.toEntity(bdaUser, user);
-            user.setAddresses(Set.of(address));
-            user.setRole(UserRole.ROLE_BDA);
-            user.setCreatedBy(user.getEmail());
-            user.setModifiedBy(user.getEmail());
-            user = userRepository.save(user);
-            userId.add(user.getId());
-
-            ObjectMapperUtils.map(user, UserDto.class);
-            bankDetailsService.toDto(user.getBankDetails());
-            addressService.toDto(user.getAddresses());
-        }
-        bdaResponse.setCreatedUserId(userId);
-        bdaResponse.setBdaUserExcelDtoList(null);
-        return bdaResponse;
-    }
 }

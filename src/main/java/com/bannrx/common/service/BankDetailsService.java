@@ -6,6 +6,7 @@ import com.bannrx.common.persistence.entities.BankDetails;
 import com.bannrx.common.persistence.entities.User;
 import com.bannrx.common.repository.BankDetailsRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rklab.utility.annotations.Loggable;
@@ -48,12 +49,14 @@ public class BankDetailsService {
     }
 
     public Set<BankDetailsDto> toDto(Set<BankDetails> bankDetailSet) throws ServerException {
-        Set<BankDetailsDto> bankDetailsDtoSet = new HashSet<>();
-        for(var entity : bankDetailSet){
-            entity = bankDetailsRepository.save(entity);
-            var dto = ObjectMapperUtils.map(entity, BankDetailsDto.class);
-            bankDetailsDtoSet.add(dto);
+        if (CollectionUtils.isNotEmpty(bankDetailSet)) {
+            Set<BankDetailsDto> bankDetailsDtoSet = new HashSet<>();
+            for(var entity : bankDetailSet){
+                var dto = ObjectMapperUtils.map(entity, BankDetailsDto.class);
+                bankDetailsDtoSet.add(dto);
+            }
+            return bankDetailsDtoSet;
         }
-        return bankDetailsDtoSet;
+        return null;
     }
 }

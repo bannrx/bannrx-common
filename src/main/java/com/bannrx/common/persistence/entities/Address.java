@@ -10,6 +10,7 @@ import rklab.utility.utilities.JsonUtils;
 
 @EqualsAndHashCode(callSuper = true, exclude = {"user"})
 @Entity
+@Builder
 @Data
 @Table
 @AllArgsConstructor

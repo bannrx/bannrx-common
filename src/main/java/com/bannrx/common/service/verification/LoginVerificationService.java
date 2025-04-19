@@ -5,6 +5,7 @@ import com.bannrx.common.dtos.verification.VerificationDto;
 import com.bannrx.common.enums.VerificationProcess;
 import com.bannrx.common.mappers.VerificationMapper;
 import com.bannrx.common.service.UserService;
+import com.bannrx.common.validationGroups.VerificationValidationGroup;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,8 +26,7 @@ public class LoginVerificationService extends AbstractVerificationService{
         var passwordData = castVerificationData(verificationDto.getVerificationData(), PasswordVerificationData.class);
         var user = userService.fetchByUsername(passwordData.getUsername());
         verificationDto.setVerified(StringUtils.equals(user.getPassword(), passwordData.getPassword()));
-        postProcess(verificationDto);
-        return verificationDto;
+        return postProcess(verificationDto);
     }
 
     @Override
@@ -39,6 +39,7 @@ public class LoginVerificationService extends AbstractVerificationService{
         super.validate(verificationDto);
         var passwordData = castVerificationData(verificationDto.getVerificationData(), PasswordVerificationData.class);
         validationUtils.validate(passwordData);
+        validationUtils.validate(passwordData, VerificationValidationGroup.class);
         var exists = userService.existsByEmailOrPhoneNo(passwordData.getUsername(), passwordData.getUsername());
         if (!exists){
             throw new InvalidInputException("Invalid Username");
@@ -51,21 +52,12 @@ public class LoginVerificationService extends AbstractVerificationService{
     }
 
     /**
-     * As the while login the security context will not have user. So, overriding common implementation
-     * to set created by and modified by manually.
+     * Logins count will be more that can lead to huge database space consumption. And so
+     * avoiding database record creation.
      *
      * @param verificationDto the verification dto
-     * @throws InvalidInputException in case logged in user parsing issue
      */
     @Override
-    protected void postProcess(VerificationDto verificationDto) throws InvalidInputException {
-        var entity = VerificationMapper.INSTANCE.toEntity(
-                verificationDto,
-                getVerifiedBy()
-        );
-        entity.setCreatedBy(getVerifiedBy());
-        entity.setModifiedBy(getVerifiedBy());
-        verificationAuditRepository.save(entity);
-    }
+    protected VerificationDto postProcess(VerificationDto verificationDto) {return  verificationDto;}
 
 }

@@ -27,8 +27,7 @@ public class VerificationAudit extends Persist {
 
     @Column(name = "verification_data", nullable = false)
     @JdbcTypeCode(SqlTypes.JSON)
-    @Convert(converter = VerificationDataConverter.class)
-    private VerificationData data;
+    private String data;
 
     @Column(name = "verified", nullable = false)
     private Boolean verified;

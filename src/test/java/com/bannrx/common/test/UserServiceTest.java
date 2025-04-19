@@ -2,6 +2,7 @@ package com.bannrx.common.test;
 
 import com.bannrx.common.dtos.*;
 import com.bannrx.common.dtos.requests.SignUpRequest;
+import com.bannrx.common.dtos.user.UserDto;
 import com.bannrx.common.enums.BusinessType;
 import com.bannrx.common.enums.UserRole;
 import com.bannrx.common.persistence.entities.Address;
@@ -58,7 +59,7 @@ public class UserServiceTest {
         validRequest  =
                 new SignUpRequest("Saurav", "1234567890", "saurav@gmail.com", "password@123", UserRole.ROLE_CAMPAIGNER,
                         Set.of(new AddressDto("AD12345","addressline1","addressline2","city","state","123456",1.25446536,2.152332)),
-                        Set.of(new BankDetailsDto("BN12345",12345L,"PNB1245",true,"123456")),
+                        Set.of(new BankDetailsDto("BN12345","12345L","PNB1245",true,"123456")),
                         new BusinessDto("BU12345","name", BusinessType.SERVICES)
         );
 
@@ -91,7 +92,7 @@ public class UserServiceTest {
     @Test
     public void testToEntitySet() throws ServerException{
 
-        Set<BankDetailsDto> bankDetailsDtoSet = Set.of(new BankDetailsDto("BN12345",12345L,"PNB1245",true,"123456"));
+        Set<BankDetailsDto> bankDetailsDtoSet = Set.of(new BankDetailsDto("BN12345","12345L","PNB1245",true,"123456"));
         Set<BankDetails> expectedBankDetails = new HashSet<>();
         BankDetails bankDetails = new BankDetails();
         bankDetails.setUser(savedUser);

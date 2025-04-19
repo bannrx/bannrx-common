@@ -1,26 +1,32 @@
 package com.bannrx.common.dtos;
 
+import com.bannrx.common.dtos.verification.VerificationData;
 import com.bannrx.common.validationGroups.AddValidationGroup;
 import com.bannrx.common.validationGroups.UpdateValidationGroup;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import static com.bannrx.common.enums.VerificationProcess.MANUAL;
 import static rklab.utility.constants.GlobalConstants.RegexPattern.IFSC_REGEX;
 
 
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BankDetailsDto {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class BankDetailsDto extends VerificationData {
 
     @NotEmpty(groups = UpdateValidationGroup.class, message = "Bank Details Id is mandatory.")
     private String id;
 
-    @NotNull(message = "Account number cannot be null")
-    private Long accountNo;
+    @NotEmpty(message = "Account number is mandatory")
+    private String accountNo;
 
     @NotEmpty(message = "IFSC code cannot be blank")
     @Size(min = 11, max = 11, message = "IFSC code must be 11 characters long")
@@ -30,6 +36,11 @@ public class BankDetailsDto {
     @NotNull(message = "Verified status cannot be null")
     private Boolean verified;
 
-    @NotEmpty(message = "Verification process ID cannot be blank")
+    @NotEmpty(message = "Verification process ID cannot be blank", groups = {AddValidationGroup.class, UpdateValidationGroup.class})
     private String verificationProcessId;
+
+    @Override
+    public void setDefaultVerificationProcess() {
+        this.setProcess(MANUAL);
+    }
 }

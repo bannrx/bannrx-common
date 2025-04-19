@@ -1,11 +1,11 @@
 package com.bannrx.common.service;
 
 import com.bannrx.common.dtos.AddressDto;
-import com.bannrx.common.enums.Status;
 import com.bannrx.common.persistence.entities.Address;
 import com.bannrx.common.persistence.entities.User;
 import com.bannrx.common.repository.AddressRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rklab.utility.annotations.Loggable;
@@ -16,7 +16,6 @@ import rklab.utility.utilities.ObjectMapperUtils;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -88,13 +87,22 @@ public class AddressService {
         return addressSet;
     }
 
+    /**
+     * To dto set.
+     *
+     * @param addresses the addresses
+     * @return the set
+     * @throws ServerException the server exception
+     */
     public Set<AddressDto> toDto(Set<Address> addresses) throws ServerException {
-        Set<AddressDto> addressDtoSet = new HashSet<>();
-        for(var entity : addresses){
-            entity = addressRepository.save(entity);
-            var dto = ObjectMapperUtils.map(entity, AddressDto.class);
-            addressDtoSet.add(dto);
+        if (CollectionUtils.isNotEmpty(addresses)) {
+            Set<AddressDto> addressDtoSet = new HashSet<>();
+            for(var entity : addresses){
+                var dto = ObjectMapperUtils.map(entity, AddressDto.class);
+                addressDtoSet.add(dto);
+            }
+            return addressDtoSet;
         }
-        return addressDtoSet;
+        return null;
     }
 }

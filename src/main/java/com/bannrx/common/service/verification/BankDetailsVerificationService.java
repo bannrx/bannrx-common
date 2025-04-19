@@ -3,6 +3,7 @@ package com.bannrx.common.service.verification;
 import com.bannrx.common.dtos.BankDetailsDto;
 import com.bannrx.common.dtos.verification.VerificationDto;
 import com.bannrx.common.enums.VerificationProcess;
+import com.bannrx.common.validationGroups.VerificationValidationGroup;
 import org.springframework.stereotype.Service;
 import rklab.utility.annotations.Loggable;
 import rklab.utility.expectations.InvalidInputException;
@@ -30,6 +31,7 @@ public class BankDetailsVerificationService extends AbstractVerificationService{
         super.validate(verificationDto);
         var bankDetailsDto = castVerificationData(verificationDto.getVerificationData(), BankDetailsDto.class);
         validationUtils.validate(bankDetailsDto);
+        validationUtils.validate(bankDetailsDto, VerificationValidationGroup.class);
     }
 
     @Override

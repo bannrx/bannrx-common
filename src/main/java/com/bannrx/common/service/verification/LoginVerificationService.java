@@ -5,6 +5,7 @@ import com.bannrx.common.dtos.verification.VerificationDto;
 import com.bannrx.common.enums.VerificationProcess;
 import com.bannrx.common.mappers.VerificationMapper;
 import com.bannrx.common.service.UserService;
+import com.bannrx.common.validationGroups.VerificationValidationGroup;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,7 @@ public class LoginVerificationService extends AbstractVerificationService{
         super.validate(verificationDto);
         var passwordData = castVerificationData(verificationDto.getVerificationData(), PasswordVerificationData.class);
         validationUtils.validate(passwordData);
+        validationUtils.validate(passwordData, VerificationValidationGroup.class);
         var exists = userService.existsByEmailOrPhoneNo(passwordData.getUsername(), passwordData.getUsername());
         if (!exists){
             throw new InvalidInputException("Invalid Username");

@@ -1,8 +1,6 @@
 package com.bannrx.common.service;
 
 import com.bannrx.common.dtos.BusinessDto;
-import com.bannrx.common.enums.BusinessType;
-import com.bannrx.common.enums.Status;
 import com.bannrx.common.persistence.entities.Business;
 import com.bannrx.common.repository.BusinessRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +10,6 @@ import rklab.utility.expectations.ServerException;
 import rklab.utility.utilities.ObjectMapperUtils;
 
 import java.util.Objects;
-import java.util.Optional;
 
 
 @Service
@@ -20,14 +17,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BusinessService {
 
-    private final BusinessRepository businessRepository;;
-
-    public Business save(BusinessDto businessDto) throws ServerException {
-        var business = ObjectMapperUtils.map(businessDto, Business.class);
-        business.setActive(true);
-        business.setType(BusinessType.FOOD_AND_BEVERAGE);
-        return businessRepository.save(business);
-    }
+    private final BusinessRepository businessRepository;
 
     public Business toEntity(BusinessDto businessDto) throws ServerException {
         return ObjectMapperUtils.map(businessDto, Business.class);

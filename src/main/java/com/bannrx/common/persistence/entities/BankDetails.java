@@ -16,13 +16,19 @@ import rklab.utility.utilities.JsonUtils;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(
+        name = "bank_details",
+        indexes = {
+                @Index(name = "idx_ac_ifsc", columnList = "account_no, ifscCode")
+        }
+)
 public class BankDetails extends Persist {
 
     @Column(name = "account_no")
-    private Long accountNo;
+    private String accountNo;
 
-    @Column(name = "IFSC_code")
-    private String IFSCCode;
+    @Column(name = "ifsc_code")
+    private String ifscCode;
 
     @Column(name = "verified")
     private Boolean verified;

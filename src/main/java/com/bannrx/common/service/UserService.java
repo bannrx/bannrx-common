@@ -1,11 +1,10 @@
 package com.bannrx.common.service;
 
 import com.bannrx.common.dtos.*;
-import com.bannrx.common.dtos.UserDto;
+import com.bannrx.common.dtos.user.UserBasicDetailsDto;
+import com.bannrx.common.dtos.user.UserDto;
 import com.bannrx.common.dtos.requests.SignUpRequest;
 import com.bannrx.common.dtos.responses.PageableResponse;
-import com.bannrx.common.persistence.entities.Address;
-import com.bannrx.common.persistence.entities.BankDetails;
 import com.bannrx.common.persistence.entities.User;
 import com.bannrx.common.repository.UserRepository;
 import com.bannrx.common.searchCriteria.UserSearchCriteria;
@@ -27,10 +26,8 @@ import rklab.utility.utilities.IdGenerator;
 import rklab.utility.utilities.ObjectMapperUtils;
 import rklab.utility.utilities.PageableUtils;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 
 @Service
@@ -115,35 +112,7 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    private static List<BankDetailsDto> getBankDetailsDtoList(Set<BankDetails> savedBankDetails) {
-        return savedBankDetails.stream()
-                .map(bankDetail -> {
-                    try {
-                        return ObjectMapperUtils.map(bankDetail, BankDetailsDto.class);
-                    } catch (ServerException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .toList();
-    }
-
-    private static List<AddressDto> getAddressDtoList(Set<Address> savedAddressDetails) {
-        return savedAddressDetails.stream()
-                .map(address -> {
-                    try {
-                        return ObjectMapperUtils.map(address, AddressDto.class);
-                    } catch (ServerException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .toList();
-    }
-
-    public boolean isExistingUser(String phoneNo){
-        return existingContactNo(phoneNo);
-    }
-
-    public UserDto update(UserDto userDto) throws ServerException, InvalidInputException {
+    public UserDto updateBasicDetails(UserBasicDetailsDto userDto) throws ServerException, InvalidInputException {
         User user = fetchById(userDto.getId());
         validateUpdateRequest(userDto, user);
         ObjectMapperUtils.map(userDto,user);
@@ -151,7 +120,7 @@ public class UserService implements UserDetailsService {
         return toDto(user);
     }
 
-    private void validateUpdateRequest(final UserDto userDto, final User user) throws InvalidInputException {
+    private void validateUpdateRequest(final UserBasicDetailsDto userDto, final User user) throws InvalidInputException {
         if (
                 StringUtils.isBlank(userDto.getName()) &&
                         StringUtils.isBlank(userDto.getPassword()) &&
@@ -164,7 +133,7 @@ public class UserService implements UserDetailsService {
         validateUpdateEmail(userDto, user);
     }
 
-    private void validateUpdatePhoneNo(final UserDto userDto, final User user) throws InvalidInputException {
+    private void validateUpdatePhoneNo(final UserBasicDetailsDto userDto, final User user) throws InvalidInputException {
         if (StringUtils.isNotBlank(userDto.getPhoneNo())){
             if (StringUtils.equals(userDto.getPhoneNo(), user.getPhoneNo())){
                 throw new InvalidInputException("Phone no didn't changed. Please provide updated details only.");
@@ -176,7 +145,7 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    private void validateUpdateEmail(final UserDto userDto, final User user) throws InvalidInputException {
+    private void validateUpdateEmail(final UserBasicDetailsDto userDto, final User user) throws InvalidInputException {
         if (StringUtils.isNotBlank(userDto.getEmail())){
             if (StringUtils.equals(userDto.getEmail(), user.getEmail())){
                 throw new InvalidInputException("Email didn't changed. Please provide updated details only.");
@@ -323,11 +292,11 @@ public class UserService implements UserDetailsService {
      *
      * @return user
      */
-    public User fetchLoggedInUser() throws InvalidInputException {
+    public SecurityUserDto fetchLoggedInUser() throws InvalidInputException {
         var userMayBe = Optional.ofNullable(SecurityUtils.getLoggedInUser());
         if (userMayBe.isPresent() &&
             userMayBe.get() instanceof SecurityUserDto user){
-            return fetchById(user.getId());
+            return user;
         }
         throw new InvalidInputException("Error while getting User from security context.");
     }

@@ -1,6 +1,7 @@
 package com.bannrx.common.dtos.verification;
 
 import com.bannrx.common.enums.VerificationProcess;
+import com.bannrx.common.validationGroups.VerificationValidationGroup;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotNull;
@@ -14,7 +15,7 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class VerificationData{
 
-    @NotNull(message = "process is mandatory.")
+    @NotNull(message = "process is mandatory.", groups = VerificationValidationGroup.class)
     private VerificationProcess process;
 
     @JsonIgnore

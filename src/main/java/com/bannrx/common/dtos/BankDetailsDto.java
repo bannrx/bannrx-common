@@ -26,7 +26,7 @@ public class BankDetailsDto extends VerificationData {
     private String id;
 
     @NotNull(message = "Account number cannot be null")
-    private Long accountNo;
+    private String accountNo;
 
     @NotEmpty(message = "IFSC code cannot be blank")
     @Size(min = 11, max = 11, message = "IFSC code must be 11 characters long")
@@ -36,7 +36,7 @@ public class BankDetailsDto extends VerificationData {
     @NotNull(message = "Verified status cannot be null")
     private Boolean verified;
 
-    @NotEmpty(message = "Verification process ID cannot be blank", groups = AddValidationGroup.class)
+    @NotEmpty(message = "Verification process ID cannot be blank", groups = {AddValidationGroup.class, UpdateValidationGroup.class})
     private String verificationProcessId;
 
     @Override

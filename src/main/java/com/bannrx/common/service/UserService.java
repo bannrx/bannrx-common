@@ -1,10 +1,12 @@
 package com.bannrx.common.service;
 
 import com.bannrx.common.dtos.*;
+import com.bannrx.common.dtos.user.BDAUserExcelDto;
 import com.bannrx.common.dtos.user.UserBasicDetailsDto;
 import com.bannrx.common.dtos.user.UserDto;
 import com.bannrx.common.dtos.requests.SignUpRequest;
 import com.bannrx.common.dtos.responses.PageableResponse;
+import com.bannrx.common.mappers.UserDetailsMapper;
 import com.bannrx.common.persistence.entities.User;
 import com.bannrx.common.repository.UserRepository;
 import com.bannrx.common.searchCriteria.UserSearchCriteria;
@@ -19,13 +21,21 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import rklab.utility.annotations.Loggable;
+import com.bannrx.common.dtos.responses.BDAResponse;
+import rklab.utility.dto.InvalidExcelRecordDto;
 import rklab.utility.expectations.InvalidInputException;
 import rklab.utility.expectations.ServerException;
+import rklab.utility.utilities.ExcelUtils;
 import rklab.utility.utilities.IdGenerator;
 import rklab.utility.utilities.ObjectMapperUtils;
 import rklab.utility.utilities.PageableUtils;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import static com.bannrx.common.enums.UserRole.ROLE_BDA;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -180,6 +190,27 @@ public class UserService implements UserDetailsService {
                 .filter(Objects::nonNull)
                 .toList();
         return new PageableResponse<>(userList, searchCriteria);
+    }
+
+
+
+    @Transactional
+    public BDAResponse createBDAUser(MultipartFile file, int sheetNo) throws IOException {
+        var excelParseData = ExcelUtils.validateAndParseToDto(file.getInputStream(), BDAUserExcelDto.class, sheetNo);
+        var userIdSet = new LinkedHashSet<String>();
+        for(var bdaUser : excelParseData.getParsedDtoSet()){
+            var user = UserDetailsMapper.INSTANCE.toEntity(bdaUser, "bannrx123", ROLE_BDA);
+            var bankDetails = Set.of(UserDetailsMapper.INSTANCE.toEntity(bdaUser, true));
+            var addresses = Set.of(UserDetailsMapper.INSTANCE.toEntity(bdaUser));
+            bankDetails.forEach(user::appendBankDetail);
+            addresses.forEach(user::appendAddress);
+            user = userRepository.save(user);
+            userIdSet.add(user.getId());
+        }
+        var errorCasesSet = excelParseData.getInvalidExcelRecordDtoList().stream()
+                .map(InvalidExcelRecordDto::toString)
+                .collect(Collectors.toSet());
+        return new BDAResponse(userIdSet, errorCasesSet);
     }
 
     /**

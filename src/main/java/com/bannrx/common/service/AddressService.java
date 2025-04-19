@@ -1,7 +1,6 @@
 package com.bannrx.common.service;
 
 import com.bannrx.common.dtos.AddressDto;
-import com.bannrx.common.enums.Status;
 import com.bannrx.common.persistence.entities.Address;
 import com.bannrx.common.persistence.entities.User;
 import com.bannrx.common.repository.AddressRepository;
@@ -17,7 +16,6 @@ import rklab.utility.utilities.ObjectMapperUtils;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 
 @Service

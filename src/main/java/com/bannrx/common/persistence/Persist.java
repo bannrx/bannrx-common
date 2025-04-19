@@ -1,7 +1,6 @@
 package com.bannrx.common.persistence;
 
 import com.bannrx.common.dtos.SecurityUserDto;
-import com.bannrx.common.persistence.entities.User;
 import com.bannrx.common.utilities.SecurityUtils;
 import jakarta.persistence.*;
 import lombok.Data;

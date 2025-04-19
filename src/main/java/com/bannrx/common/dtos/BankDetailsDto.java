@@ -25,7 +25,7 @@ public class BankDetailsDto extends VerificationData {
     @NotEmpty(groups = UpdateValidationGroup.class, message = "Bank Details Id is mandatory.")
     private String id;
 
-    @NotNull(message = "Account number cannot be null")
+    @NotEmpty(message = "Account number is mandatory")
     private String accountNo;
 
     @NotEmpty(message = "IFSC code cannot be blank")

@@ -2,6 +2,7 @@ package com.bannrx.common.service;
 
 import com.bannrx.common.dtos.BankDetailsDto;
 import com.bannrx.common.persistence.entities.BankDetails;
+import com.bannrx.common.persistence.entities.User;
 import com.bannrx.common.repository.BankDetailsRepository;
 import com.bannrx.common.service.verification.VerificationAuditService;
 import lombok.RequiredArgsConstructor;

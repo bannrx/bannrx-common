@@ -45,17 +45,17 @@ public class BankDetailsService {
         if (!StringUtils.equals(bankDetailUserId, loggedInUserId)){
             throw new UnsupportedOperationException("Bank Details are associated to other user.");
         }
-        validateIsBankAccountNoExist(bankDetailsDto);
-        var verificationAudit = verificationAuditService.fetchById(bankDetailsDto.getVerificationProcessId());
-        if (!verificationAudit.getVerified()){
-            throw new InvalidInputException("Bank detail are not verified.");
-        }
+        validateAdd(bankDetailsDto);
     }
 
-    public void validateIsBankAccountNoExist(BankDetailsDto bankDetailsDto) throws InvalidInputException {
+    public void validateAdd(BankDetailsDto bankDetailsDto) throws InvalidInputException {
         var exists = existsByAccountNoAndIfscCode(bankDetailsDto.getAccountNo(), bankDetailsDto.getIfscCode());
         if (exists){
             throw new InvalidInputException("Bank details already exists.");
+        }
+        var verificationAudit = verificationAuditService.fetchById(bankDetailsDto.getVerificationProcessId());
+        if (!verificationAudit.getVerified()){
+            throw new InvalidInputException("Bank detail are not verified.");
         }
     }
 

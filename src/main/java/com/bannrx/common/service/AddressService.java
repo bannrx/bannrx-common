@@ -6,6 +6,7 @@ import com.bannrx.common.persistence.entities.User;
 import com.bannrx.common.repository.AddressRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rklab.utility.annotations.Loggable;
@@ -69,13 +70,16 @@ public class AddressService {
         var address = fetchById(addressDto.getId());
         ObjectMapperUtils.map(addressDto, address);
         address = addressRepository.save(address);
-        addressDto = ObjectMapperUtils.map(address, AddressDto.class);
-        return addressDto;
+        return toDto(address);
+    }
+
+    private AddressDto toDto(Address address) throws ServerException {
+        return ObjectMapperUtils.map(address, AddressDto.class);
     }
 
     public Address fetchById(String addressId) throws InvalidInputException {
         return addressRepository.findById(addressId).
-                orElseThrow(()->new InvalidInputException("Address not found with id "+addressId));
+                orElseThrow(()-> new InvalidInputException("Address not found with id "+addressId));
     }
 
     public Set<Address> toEntitySet(Set<AddressDto> addressDtoSet) throws ServerException {
@@ -104,5 +108,13 @@ public class AddressService {
             return addressDtoSet;
         }
         return null;
+    }
+
+    public void validate(AddressDto addressDto, String loggedInUserId) throws InvalidInputException {
+        var address = fetchById(addressDto.getId());
+        var addressUserId = address.getUser().getId();
+        if (!StringUtils.equals(addressUserId, loggedInUserId)){
+            throw new UnsupportedOperationException("Address Details are associated to other user.");
+        }
     }
 }

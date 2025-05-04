@@ -50,6 +50,7 @@ public class UserService implements UserDetailsService {
     @Autowired private BankDetailsService bankDetailsService;
     @Autowired private AddressService addressService;
 
+    private static final String PASSWORD = "bannrx123";
 
     /**
      * Sign up user dto. As this is a free request, the security context will not have logged-in user.
@@ -199,7 +200,7 @@ public class UserService implements UserDetailsService {
         var excelParseData = ExcelUtils.validateAndParseToDto(file.getInputStream(), BDAUserExcelDto.class, sheetNo);
         var userIdSet = new LinkedHashSet<String>();
         for(var bdaUser : excelParseData.getParsedDtoSet()){
-            var user = UserDetailsMapper.INSTANCE.toEntity(bdaUser, "bannrx123", ROLE_BDA);
+            var user = UserDetailsMapper.INSTANCE.toEntity(bdaUser, PASSWORD, ROLE_BDA);
             var bankDetails = Set.of(UserDetailsMapper.INSTANCE.toEntity(bdaUser, true));
             var addresses = Set.of(UserDetailsMapper.INSTANCE.toEntity(bdaUser));
             bankDetails.forEach(user::appendBankDetail);

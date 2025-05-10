@@ -21,7 +21,7 @@ public class DeviceDto {
 
     @NotNull(message = "Dimension should not be null or empty")
     @Valid
-    private DimensionUpdateDto dimension;
+    private DimensionDto dimension;
 
     @NotNull(message = "isFrontCameraAvailable should not be null")
     private Boolean isFrontCameraAvailable;

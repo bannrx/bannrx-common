@@ -1,5 +1,9 @@
 package com.bannrx.common.dtos.device;
 
+import com.bannrx.common.enums.Unit;
+import com.bannrx.common.validationGroups.UpdateValidationGroup;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
@@ -11,14 +15,14 @@ import lombok.Data;
 public class DimensionDto {
     @NotNull(message = "length cannot be null")
     @Positive(message = "Length must be positive")
-    private Number length;
+    private Float length;
 
     @NotNull(message = "breadth cannot be null")
     @Positive(message = "Breadth must be positive")
-    private Number breadth;
+    private Float breadth;
 
+    @Enumerated(EnumType.STRING)
     @NotNull(message = "Unit cannot be null")
-    @Pattern(regexp = "mm|cm|m|in", message = "Unit must be one of: mm, cm, m, in")
-    private String unit;
+    private Unit unit;
 
 }

@@ -2,7 +2,10 @@ package com.bannrx.common.service;
 
 import com.bannrx.common.dtos.BusinessDto;
 import com.bannrx.common.persistence.entities.Business;
+import com.bannrx.common.persistence.entities.User;
 import com.bannrx.common.repository.BusinessRepository;
+import com.bannrx.common.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -16,14 +19,11 @@ import java.util.Objects;
 
 @Service
 @Loggable
+@RequiredArgsConstructor
 public class BusinessService {
 
     private final BusinessRepository businessRepository;
-    private final UserService userService;
-    public BusinessService(BusinessRepository businessRepository, @Lazy UserService userService) {
-        this.businessRepository = businessRepository;
-        this.userService = userService;
-    }
+    private final UserRepository userRepository;
 
     public Business toEntity(BusinessDto businessDto) throws ServerException {
         return ObjectMapperUtils.map(businessDto, Business.class);
@@ -58,11 +58,17 @@ public class BusinessService {
     }
 
     public void validate(BusinessDto businessDto, String loggedInUserId) throws InvalidInputException {
-        var user = userService.fetchById(loggedInUserId);
+        var user = fetchUserById(loggedInUserId);
         var businessId = user.getBusiness().getId();
         if (!StringUtils.equals(businessId, businessDto.getId())){
             throw new UnsupportedOperationException("Business Details are associated to other user.");
         }
+    }
+
+    private User fetchUserById(String id) throws InvalidInputException {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new InvalidInputException(
+                        String.format("User not found with Id %s", id)));
     }
 
 }

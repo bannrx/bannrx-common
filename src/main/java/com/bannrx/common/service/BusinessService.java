@@ -7,13 +7,14 @@ import com.bannrx.common.repository.BusinessRepository;
 import com.bannrx.common.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import rklab.utility.annotations.Loggable;
 import rklab.utility.expectations.InvalidInputException;
 import rklab.utility.expectations.ServerException;
 import rklab.utility.utilities.ObjectMapperUtils;
-
 import java.util.Objects;
+
 
 
 @Service
@@ -51,7 +52,9 @@ public class BusinessService {
 
     private Business fetchById(String id) throws InvalidInputException {
         return businessRepository.findById(id)
-                .orElseThrow(()-> new InvalidInputException("Business Details is not found with this id "+ id));
+                .orElseThrow(()-> new InvalidInputException(
+                        String.format("Business Details is not found with Id %s ", id))
+                );
     }
 
     public void validate(BusinessDto businessDto, String loggedInUserId) throws InvalidInputException {
@@ -64,6 +67,8 @@ public class BusinessService {
 
     private User fetchUserById(String id) throws InvalidInputException {
         return userRepository.findById(id)
-                .orElseThrow(()-> new InvalidInputException("User is not found with this id "+ id));
+                .orElseThrow(() -> new InvalidInputException(
+                        String.format("User not found with Id %s", id)));
     }
+
 }

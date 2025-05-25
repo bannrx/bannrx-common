@@ -1,8 +1,13 @@
 package com.bannrx.common.service;
 
 import com.bannrx.common.dtos.device.DeviceDto;
+import com.bannrx.common.dtos.responses.PageableResponse;
+import com.bannrx.common.enums.Operator;
+import com.bannrx.common.enums.Unit;
 import com.bannrx.common.persistence.entities.Device;
 import com.bannrx.common.repository.DeviceRepository;
+import com.bannrx.common.searchCriteria.DeviceSearchCriteria;
+import com.bannrx.common.specifications.DeviceSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,8 +15,8 @@ import rklab.utility.annotations.Loggable;
 import rklab.utility.expectations.InvalidInputException;
 import rklab.utility.expectations.ServerException;
 import rklab.utility.utilities.ObjectMapperUtils;
-import java.util.ArrayList;
-import java.util.List;
+import rklab.utility.utilities.PageableUtils;
+import java.util.Objects;
 
 
 @Loggable
@@ -25,6 +30,14 @@ public class DeviceService {
         var device = toEntity(request);
         device = deviceRepository.save(device);
         return toDto(device);
+    }
+
+    private DeviceDto getDeviceDto(Device device){
+        try{
+            return toDto(device);
+        }catch (ServerException e){
+            return null;
+        }
     }
 
     public DeviceDto toDto(Device device) throws ServerException {
@@ -58,13 +71,28 @@ public class DeviceService {
         return deviceRepository.existsById(deviceId);
     }
 
-    public List<DeviceDto> fetchAllDevice() throws ServerException {
-        List<Device> deviceList = deviceRepository.findAll();
-        List<DeviceDto> deviceDtoList = new ArrayList<>(deviceList.size());
-        for(var device: deviceList){
-            var dto = toDto(device);
-            deviceDtoList.add(dto);
+    public PageableResponse<DeviceDto> fetch(DeviceSearchCriteria searchCriteria) {
+        setDefaultIfApplicable(searchCriteria);
+        var pageable = PageableUtils.createPageable(searchCriteria);
+        var devicePage = deviceRepository.findAll(DeviceSpecification.buildSearchCriteria(searchCriteria), pageable);
+        var deviceList = devicePage.getContent().stream()
+                .map(this::getDeviceDto)
+                .filter(Objects::nonNull)
+                .toList();
+        return new PageableResponse<>(deviceList,searchCriteria);
+    }
+
+    private void setDefaultIfApplicable(DeviceSearchCriteria searchCriteria) {
+        if(Objects.nonNull(searchCriteria.getLength()) && Objects.isNull(searchCriteria.getLengthOperator())){
+            searchCriteria.setLengthOperator(Operator.EQUALTO);
         }
-       return deviceDtoList;
+
+        if(Objects.nonNull(searchCriteria.getBreadth()) && Objects.isNull(searchCriteria.getBreadthOperator())){
+            searchCriteria.setBreadthOperator(Operator.EQUALTO);
+        }
+
+        if(Objects.nonNull(searchCriteria.getLength()) || Objects.nonNull(searchCriteria.getBreadth()) && Objects.isNull(searchCriteria.getUnit())){
+            searchCriteria.setUnit(Unit.CM);
+        }
     }
 }

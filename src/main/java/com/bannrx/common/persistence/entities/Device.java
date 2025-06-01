@@ -3,7 +3,9 @@ package com.bannrx.common.persistence.entities;
 import com.bannrx.common.dtos.device.DimensionDto;
 import com.bannrx.common.persistence.Persist;
 import com.bannrx.common.utilities.DeviceDimensionConverter;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,10 +35,6 @@ public class Device extends Persist {
 
     @Column(name = "remarks")
     private String remarks;
-
-    @JoinColumn(name = "address_id")
-    @OneToOne
-    private Address address;
 
     @Override
     public String getPrefix() {

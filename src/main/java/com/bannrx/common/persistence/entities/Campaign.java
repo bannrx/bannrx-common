@@ -19,7 +19,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "campaign", indexes = {
         @Index(name = "idx_name", columnList = "name"),
-        @Index(name = "idx_date", columnList = "start_date, end_date")
+        @Index(name = "idx_name_date", columnList = "name, start_date, end_date")
 })
 public class Campaign extends Persist {
 

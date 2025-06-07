@@ -1,17 +1,22 @@
 package com.bannrx.common.service;
 
 import com.bannrx.common.dtos.campaign.CampaignDto;
+import com.bannrx.common.dtos.responses.PageableResponse;
 import com.bannrx.common.enums.Phase;
 import com.bannrx.common.persistence.entities.Campaign;
 import com.bannrx.common.repository.CampaignRepository;
+import com.bannrx.common.searchCriteria.CampaignSearchCriteria;
+import com.bannrx.common.specifications.CampaignSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rklab.utility.expectations.InvalidInputException;
 import rklab.utility.expectations.ServerException;
 import rklab.utility.utilities.ObjectMapperUtils;
+import rklab.utility.utilities.PageableUtils;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 
 @Service
@@ -31,8 +36,12 @@ public class CampaignService {
         campaign.setPhase(Phase.CREATE);
     }
 
-    private CampaignDto toDto(Campaign campaign) throws ServerException {
-        return ObjectMapperUtils.map(campaign, CampaignDto.class);
+    private CampaignDto toDto(Campaign campaign)  {
+        try {
+          return ObjectMapperUtils.map(campaign, CampaignDto.class);
+        }catch (ServerException ex){
+            return null;
+        }
     }
 
     private Campaign toEntity(CampaignDto dto) throws ServerException {
@@ -83,5 +92,16 @@ public class CampaignService {
     public String delete(String campaignId) throws InvalidInputException {
         campaignRepository.deleteById(campaignId);
         return String.format("Campaign Deleted Successfully %s", campaignId);
+    }
+
+    public PageableResponse<CampaignDto> fetch(CampaignSearchCriteria searchCriteria){
+        var pageable = PageableUtils.createPageable(searchCriteria);
+        var campaignPage = campaignRepository.findAll(CampaignSpecification.buildSearchCriteria(searchCriteria), pageable);
+        var campaignList = campaignPage.getContent().stream()
+                .map(this::toDto)
+                .filter(Objects::nonNull)
+                .toList();
+
+        return new PageableResponse<>(campaignList,searchCriteria);
     }
 }

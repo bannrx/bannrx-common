@@ -3,6 +3,7 @@ package com.bannrx.common.service;
 import com.bannrx.common.dtos.campaign.CampaignDto;
 import com.bannrx.common.dtos.responses.PageableResponse;
 import com.bannrx.common.enums.Phase;
+import com.bannrx.common.mappers.CampaignMapper;
 import com.bannrx.common.persistence.entities.Campaign;
 import com.bannrx.common.repository.CampaignRepository;
 import com.bannrx.common.searchCriteria.CampaignSearchCriteria;
@@ -25,27 +26,18 @@ public class CampaignService {
     private final CampaignRepository campaignRepository;
 
 
-    public CampaignDto register(CampaignDto dto) throws ServerException {
+    public CampaignDto register(CampaignDto dto) {
         var campaign = toEntity(dto);
-        setDefaultValue(campaign);
         campaign = campaignRepository.save(campaign);
         return toDto(campaign);
     }
 
-    private void setDefaultValue(Campaign campaign) {
-        campaign.setPhase(Phase.CREATE);
-    }
-
     private CampaignDto toDto(Campaign campaign)  {
-        try {
-          return ObjectMapperUtils.map(campaign, CampaignDto.class);
-        }catch (ServerException ex){
-            return null;
-        }
+        return CampaignMapper.INSTANCE.toDto(campaign);
     }
 
-    private Campaign toEntity(CampaignDto dto) throws ServerException {
-        return ObjectMapperUtils.map(dto, Campaign.class);
+    private Campaign toEntity(CampaignDto dto) {
+        return CampaignMapper.INSTANCE.toEntity(dto, Phase.CREATE);
     }
 
     public void validateCampaignDates(CampaignDto dto) throws InvalidInputException {
@@ -70,7 +62,7 @@ public class CampaignService {
 
     public CampaignDto update(CampaignDto dto) throws InvalidInputException, ServerException {
         var campaign = fetchById(dto.getId());
-        ObjectMapperUtils.map(dto,campaign);
+        CampaignMapper.INSTANCE.updateFromDto(dto,campaign);
         campaign = campaignRepository.save(campaign);
         return toDto(campaign);
     }

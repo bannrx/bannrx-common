@@ -34,10 +34,6 @@ public class Device extends Persist {
     @Column(name = "remarks")
     private String remarks;
 
-    @JoinColumn(name = "address_id")
-    @OneToOne
-    private Address address;
-
     @Override
     public String getPrefix() {
         return "DE";

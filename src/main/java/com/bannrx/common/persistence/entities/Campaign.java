@@ -23,7 +23,7 @@ import java.time.LocalDate;
 })
 public class Campaign extends Persist {
 
-    @Column(name = "name", length = 225, nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "description")

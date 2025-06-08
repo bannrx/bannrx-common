@@ -43,10 +43,6 @@ public class Address extends Persist {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @JoinColumn(name = "device_id")
-    @OneToOne
-    private Device device;
-
     @Override
     @JsonIgnore
     public String getPrefix() {

@@ -1,9 +1,11 @@
 package com.bannrx.common.service;
 
 import com.bannrx.common.dtos.device.DeviceDto;
+import com.bannrx.common.dtos.device.DimensionDto;
 import com.bannrx.common.dtos.responses.PageableResponse;
 import com.bannrx.common.enums.Operator;
 import com.bannrx.common.enums.Unit;
+import com.bannrx.common.mappers.DimensionMapper;
 import com.bannrx.common.persistence.entities.Device;
 import com.bannrx.common.repository.DeviceRepository;
 import com.bannrx.common.searchCriteria.DeviceSearchCriteria;
@@ -19,17 +21,30 @@ import rklab.utility.utilities.PageableUtils;
 import java.util.Objects;
 
 
+
+
 @Loggable
 @Service
 @RequiredArgsConstructor
 public class DeviceService {
 
     private final DeviceRepository deviceRepository;
+    private final DimensionService dimensionService;
+
 
     public DeviceDto register(DeviceDto request) throws ServerException {
+        saveDimension(request.getDimension());
         var device = toEntity(request);
         device = deviceRepository.save(device);
         return toDto(device);
+    }
+
+    private void saveDimension(DimensionDto dto) {
+        var dimensionSearchCriteria = DimensionMapper.INSTANCE.toSearchCriteria(dto);
+        var dimension = dimensionService.search(dimensionSearchCriteria);
+        if(dimension.getContent().isEmpty()){
+            dimensionService.save(dimensionSearchCriteria);
+        }
     }
 
     private DeviceDto getDeviceDto(Device device){

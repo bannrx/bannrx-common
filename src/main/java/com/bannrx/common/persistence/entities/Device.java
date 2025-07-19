@@ -3,9 +3,8 @@ package com.bannrx.common.persistence.entities;
 import com.bannrx.common.dtos.device.DimensionDto;
 import com.bannrx.common.persistence.Persist;
 import com.bannrx.common.utilities.DeviceDimensionConverter;
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,7 +12,7 @@ import lombok.NoArgsConstructor;
 import rklab.utility.utilities.JsonUtils;
 
 
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = "userProfile")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -35,6 +34,11 @@ public class Device extends Persist {
 
     @Column(name = "remarks")
     private String remarks;
+
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "user_profile_id", nullable = false)
+    private UserProfile userProfile;
 
     @Override
     public String getPrefix() {

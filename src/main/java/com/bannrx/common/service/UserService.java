@@ -63,7 +63,9 @@ public class UserService implements UserDetailsService {
      */
     @Transactional
     public UserDto signUp(SignUpRequest request) throws ServerException {
-        var user = toEntity(request);
+//        var user = toEntity(request);
+        var user = UserDetailsMapper.INSTANCE.toEntity(request);
+        var userProfile =
         user.setId(user.getPrefix().concat(IdGenerator.generateId()));
         setUpCreatedByAndModifiedBy(user);
         user = userRepository.save(user);

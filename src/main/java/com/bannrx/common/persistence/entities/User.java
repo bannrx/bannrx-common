@@ -2,19 +2,13 @@ package com.bannrx.common.persistence.entities;
 
 import com.bannrx.common.enums.UserRole;
 import com.bannrx.common.persistence.Persist;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import rklab.utility.expectations.ServerException;
 import rklab.utility.utilities.JsonUtils;
-import java.util.*;
-import java.util.List;
-
 
 
 @EqualsAndHashCode(callSuper = true, exclude = {"authToken"})
@@ -50,6 +44,17 @@ public class User extends Persist {
     @JoinColumn(name = "auth_token_id", referencedColumnName = "id")
     @JsonIgnore
     private AuthToken authToken;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonBackReference
+    private UserProfile userProfile;
+
+    public void createProfile() {
+        if (this.userProfile == null) {
+            this.userProfile = new UserProfile();
+            this.userProfile.setUser(this);
+        }
+    }
 
     @Override
     protected String setDefaultModifiedBy(){

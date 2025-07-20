@@ -21,18 +21,19 @@ import java.util.*;
 public class UserProfile extends Persist {
 
 
-    @OneToOne
+    @JsonManagedReference
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     @JsonManagedReference
     @JsonIgnore
-    @OneToMany(mappedBy = "user_profile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "userProfile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Address> addresses = new HashSet<>();
 
     @JsonManagedReference
     @JsonIgnore
-    @OneToMany(mappedBy = "user_profile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "userProfile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<BankDetails> bankDetails = new HashSet<>();
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -40,7 +41,8 @@ public class UserProfile extends Persist {
     @JsonIgnore
     private Business business;
 
-    @OneToMany(mappedBy = "user_profile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    @OneToMany(mappedBy = "userProfile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<Device> deviceSet = new HashSet<>();
 

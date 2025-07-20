@@ -41,7 +41,7 @@ public class BankDetailsService {
      */
     public void validate(BankDetailsDto bankDetailsDto, String loggedInUserId) throws InvalidInputException {
         var bankDetails = fetchById(bankDetailsDto.getId());
-        var bankDetailUserId = bankDetails.getUser().getId();
+        var bankDetailUserId = bankDetails.getUserProfile().getUser().getId();
         if (!StringUtils.equals(bankDetailUserId, loggedInUserId)){
             throw new UnsupportedOperationException("Bank Details are associated to other user.");
         }

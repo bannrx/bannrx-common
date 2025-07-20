@@ -59,7 +59,7 @@ public class BusinessService {
 
     public void validate(BusinessDto businessDto, String loggedInUserId) throws InvalidInputException {
         var user = fetchUserById(loggedInUserId);
-        var businessId = user.getBusiness().getId();
+        var businessId = user.getUserProfile().getBusiness().getId();
         if (!StringUtils.equals(businessId, businessDto.getId())){
             throw new UnsupportedOperationException("Business Details are associated to other user.");
         }

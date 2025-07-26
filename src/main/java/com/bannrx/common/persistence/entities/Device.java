@@ -3,6 +3,7 @@ package com.bannrx.common.persistence.entities;
 import com.bannrx.common.dtos.device.DimensionDto;
 import com.bannrx.common.persistence.Persist;
 import com.bannrx.common.utilities.DeviceDimensionConverter;
+import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

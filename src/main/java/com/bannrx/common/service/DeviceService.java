@@ -5,8 +5,10 @@ import com.bannrx.common.dtos.device.DimensionDto;
 import com.bannrx.common.dtos.responses.PageableResponse;
 import com.bannrx.common.enums.Operator;
 import com.bannrx.common.enums.Unit;
+import com.bannrx.common.mappers.DeviceMapper;
 import com.bannrx.common.mappers.DimensionMapper;
 import com.bannrx.common.persistence.entities.Device;
+import com.bannrx.common.persistence.entities.UserProfile;
 import com.bannrx.common.repository.DeviceRepository;
 import com.bannrx.common.searchCriteria.DeviceSearchCriteria;
 import com.bannrx.common.specifications.DeviceSpecification;
@@ -30,11 +32,15 @@ public class DeviceService {
 
     private final DeviceRepository deviceRepository;
     private final DimensionService dimensionService;
+    private final UserService userService;
 
 
-    public DeviceDto register(DeviceDto request) throws ServerException {
+    public DeviceDto register(DeviceDto request) throws ServerException, InvalidInputException {
         saveDimension(request.getDimension());
+        var loggedInUser = userService.fetchLoggedInUser();
+        var user = userService.fetchById(loggedInUser.getId());
         var device = toEntity(request);
+        device.setUserProfile(user.getUserProfile());
         device = deviceRepository.save(device);
         return toDto(device);
     }
@@ -60,7 +66,7 @@ public class DeviceService {
     }
 
     public Device toEntity(DeviceDto request) throws ServerException {
-        return ObjectMapperUtils.map(request, Device.class);
+        return DeviceMapper.INSTANCE.toEntity(request);
     }
 
     @Transactional

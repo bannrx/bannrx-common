@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.bannrx"
-version = "common-0.0.9-SNAPSHOT"
+version = "common-0.1.0-SNAPSHOT"
 
 java {
 	toolchain {

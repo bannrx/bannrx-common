@@ -35,6 +35,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import static com.bannrx.common.enums.UserRole.ROLE_BDA;
+
+
 import java.util.Objects;
 import java.util.Optional;
 
@@ -67,6 +69,7 @@ public class UserService implements UserDetailsService {
         var user = toEntity(request);
         user.setId(user.getPrefix().concat(IdGenerator.generateId()));
         setUpCreatedByAndModifiedBy(user);
+        user.appendRole(request.getRole());
         user = userRepository.save(user);
         return toDto(user);
     }
@@ -371,4 +374,10 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
+    public String deleteUserProfile(String userId) throws InvalidInputException {
+        var user = fetchById(userId);
+        var profile = user.getUserProfile();
+        user.setUserProfile(null);
+        return profileService.delete(profile);
+    }
 }

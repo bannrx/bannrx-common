@@ -7,10 +7,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -21,18 +24,20 @@ public class SecurityUserDto implements UserDetails {
     private String id;
     private String email;
     private String password;
-    private UserRole userRole;
+    private Set<UserRole> userRoles;
 
     public SecurityUserDto(User user){
         this.id = user.getId();
         this.email = user.getEmail();
         this.password = user.getPassword();
-        this.userRole = user.getRole();
+        this.userRoles = user.fetchRole();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return userRoles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.name()))
+                .collect(Collectors.toSet());
     }
 
     @Override

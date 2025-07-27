@@ -9,6 +9,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
 import rklab.utility.utilities.JsonUtils;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static rklab.utility.constants.GlobalConstants.Symbols.COMMA;
 
 
 @EqualsAndHashCode(callSuper = true, exclude = {"authToken"})
@@ -36,9 +42,8 @@ public class User extends Persist {
     @JsonIgnore
     private String password;
 
-    @Column(name = "role")
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
+    @Column(name = "roles")
+    private String roles;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "auth_token_id", referencedColumnName = "id")
@@ -63,6 +68,25 @@ public class User extends Persist {
             retVal = this.email;
         }
         return retVal;
+    }
+
+    public Set<UserRole> fetchRole(){
+        if(roles == null || roles.isBlank()){
+            return new HashSet<>();
+        }
+
+        return Arrays.stream(roles.split(COMMA))
+                .map(String::trim)
+                .map(UserRole::valueOf)
+                .collect(Collectors.toSet());
+    }
+
+    public void appendRole(UserRole role){
+        Set<UserRole> existingRole = fetchRole();
+        existingRole.add(role);
+        this.roles = existingRole.stream()
+                .map(Enum::name)
+                .collect(Collectors.joining(","));
     }
 
     @Override

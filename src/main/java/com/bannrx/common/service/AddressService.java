@@ -3,6 +3,7 @@ package com.bannrx.common.service;
 import com.bannrx.common.dtos.AddressDto;
 import com.bannrx.common.persistence.entities.Address;
 import com.bannrx.common.persistence.entities.User;
+import com.bannrx.common.persistence.entities.UserProfile;
 import com.bannrx.common.repository.AddressRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
@@ -29,13 +30,13 @@ public class AddressService {
 
 
     @Transactional
-    public Set<Address> save(List<AddressDto> addressDtoList, User user) throws ServerException {
+    public Set<Address> save(List<AddressDto> addressDtoList, UserProfile userProfile) throws ServerException {
         Set<Address> addresses = new HashSet<>();
 
         for(var dto : addressDtoList){
             var address = ObjectMapperUtils.map(dto, Address.class);
             address.setActive(true);
-            address.setUser(user);
+            address.setUserProfile(userProfile);
             address = addressRepository.save(address);
             addresses.add(address);
         }
@@ -112,7 +113,7 @@ public class AddressService {
 
     public void validate(AddressDto addressDto, String loggedInUserId) throws InvalidInputException {
         var address = fetchById(addressDto.getId());
-        var addressUserId = address.getUser().getId();
+        var addressUserId = address.getUserProfile().getUser().getId();
         if (!StringUtils.equals(addressUserId, loggedInUserId)){
             throw new UnsupportedOperationException("Address Details are associated to other user.");
         }

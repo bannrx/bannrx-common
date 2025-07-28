@@ -4,5 +4,6 @@ public enum UserRole {
     ROLE_BDA,
     ROLE_SCREEN_HANDLER,
     ROLE_ADMIN,
-    ROLE_CAMPAIGNER
+    ROLE_CAMPAIGNER,
+    ROLE_OPERATIONS
 }

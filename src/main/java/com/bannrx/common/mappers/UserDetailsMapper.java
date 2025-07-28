@@ -1,6 +1,8 @@
 package com.bannrx.common.mappers;
 
+import com.bannrx.common.dtos.requests.SignUpRequest;
 import com.bannrx.common.dtos.user.BDAUserExcelDto;
+import com.bannrx.common.dtos.user.UserDto;
 import com.bannrx.common.enums.UserRole;
 import com.bannrx.common.persistence.entities.Address;
 import com.bannrx.common.persistence.entities.BankDetails;

@@ -34,10 +34,12 @@ import rklab.utility.utilities.PageableUtils;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import static com.bannrx.common.enums.UserRole.ROLE_BDA;
+
+
 import java.util.Objects;
 import java.util.Optional;
+
 
 
 @Service
@@ -49,6 +51,7 @@ public class UserService implements UserDetailsService {
     @Autowired private BusinessService businessService;
     @Autowired private BankDetailsService bankDetailsService;
     @Autowired private AddressService addressService;
+    @Autowired private UserProfileService profileService;
 
     private static final String PASSWORD = "bannrx123";
 
@@ -66,30 +69,36 @@ public class UserService implements UserDetailsService {
         var user = toEntity(request);
         user.setId(user.getPrefix().concat(IdGenerator.generateId()));
         setUpCreatedByAndModifiedBy(user);
+        user.appendRole(request.getRole());
         user = userRepository.save(user);
         return toDto(user);
     }
 
     private UserDto toDto(User user) throws ServerException {
         var userDto = ObjectMapperUtils.map(user, UserDto.class);
-        var bankDtoSet = bankDetailsService.toDto(user.getBankDetails());
-        var addressDtoSet = addressService.toDto(user.getAddresses());
-        var businessDto = businessService.toDto(user.getBusiness());
-        userDto.setAddressDtoSet(addressDtoSet);
-        userDto.setBankDetailsDtoSet(bankDtoSet);
-        userDto.setBusinessDto(businessDto);
+        var profile = user.getUserProfile();
+        if(Objects.nonNull(profile)) {
+            var bankDtoSet = bankDetailsService.toDto(profile.getBankDetails());
+            var addressDtoSet = addressService.toDto(profile.getAddresses());
+            var businessDto = businessService.toDto(profile.getBusiness());
+            userDto.setAddressDtoSet(addressDtoSet);
+            userDto.setBankDetailsDtoSet(bankDtoSet);
+            userDto.setBusinessDto(businessDto);
+        }
         return userDto;
     }
 
     private User toEntity(SignUpRequest request) throws ServerException {
         var retVal = ObjectMapperUtils.map(request, User.class);
+        retVal.createProfile();
+        var profile = retVal.getUserProfile();
         var bankDetails = bankDetailsService.toEntitySet(request.getBankDetailsDtoSet());
         var addresses = addressService.toEntitySet(request.getAddressDtoSet());
         var business = businessService.toEntity(request.getBusinessDto());
-        retVal.setBankDetails(null);
-        bankDetails.forEach(retVal::appendBankDetail);
-        addresses.forEach(retVal::appendAddress);
-        retVal.setBusiness(business);
+        profile.setBankDetails(bankDetails);
+        bankDetails.forEach(profile::appendBankDetail);
+        addresses.forEach(profile::appendAddress);
+        profile.setBusiness(business);
         return retVal;
     }
 
@@ -104,20 +113,23 @@ public class UserService implements UserDetailsService {
         var id = user.getId();
         user.setCreatedBy(id);
         user.setModifiedBy(id);
-        if (CollectionUtils.isNotEmpty(user.getAddresses())){
-            user.getAddresses().forEach(address -> {
+        var profile = user.getUserProfile();
+        profile.setCreatedBy(id);
+        profile.setModifiedBy(id);
+        if (CollectionUtils.isNotEmpty(profile.getAddresses())){
+            profile.getAddresses().forEach(address -> {
                 address.setCreatedBy(id);
                 address.setModifiedBy(id);
             });
         }
-        if (CollectionUtils.isNotEmpty(user.getBankDetails())){
-            user.getBankDetails().forEach(bankDetails -> {
+        if (CollectionUtils.isNotEmpty(profile.getBankDetails())){
+            profile.getBankDetails().forEach(bankDetails -> {
                 bankDetails.setCreatedBy(id);
                 bankDetails.setModifiedBy(id);
             });
         }
-        if (Objects.nonNull(user.getBusiness())){
-            var business = user.getBusiness();
+        if (Objects.nonNull(profile.getBusiness())){
+            var business = profile.getBusiness();
             business.setCreatedBy(id);
             business.setModifiedBy(id);
         }
@@ -203,8 +215,9 @@ public class UserService implements UserDetailsService {
             var user = UserDetailsMapper.INSTANCE.toEntity(bdaUser, PASSWORD, ROLE_BDA);
             var bankDetails = Set.of(UserDetailsMapper.INSTANCE.toEntity(bdaUser, true));
             var addresses = Set.of(UserDetailsMapper.INSTANCE.toEntity(bdaUser));
-            bankDetails.forEach(user::appendBankDetail);
-            addresses.forEach(user::appendAddress);
+            var profile = user.getUserProfile();
+            bankDetails.forEach(profile::appendBankDetail);
+            addresses.forEach(profile::appendAddress);
             user = userRepository.save(user);
             userIdSet.add(user.getId());
         }
@@ -361,4 +374,10 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
+    public String deleteUserProfile(String userId) throws InvalidInputException {
+        var user = fetchById(userId);
+        var profile = user.getUserProfile();
+        user.setUserProfile(null);
+        return profileService.delete(profile);
+    }
 }

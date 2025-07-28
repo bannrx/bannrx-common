@@ -8,7 +8,7 @@ import rklab.utility.utilities.JsonUtils;
 
 
 
-@EqualsAndHashCode(callSuper = true, exclude = {"user"})
+@EqualsAndHashCode(callSuper = true, exclude = {"userProfile"})
 @Entity
 @Builder
 @Data
@@ -40,8 +40,8 @@ public class Address extends Persist {
 
     @JsonBackReference
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "user_profile_id", nullable = false)
+    private UserProfile userProfile;
 
     @Override
     @JsonIgnore

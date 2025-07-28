@@ -2,22 +2,22 @@ package com.bannrx.common.persistence.entities;
 
 import com.bannrx.common.enums.UserRole;
 import com.bannrx.common.persistence.Persist;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import rklab.utility.expectations.ServerException;
 import rklab.utility.utilities.JsonUtils;
-import java.util.*;
-import java.util.List;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static rklab.utility.constants.GlobalConstants.Symbols.COMMA;
 
 
-
-@EqualsAndHashCode(callSuper = true, exclude = {"addresses", "bankDetails", "business", "authToken"})
+@EqualsAndHashCode(callSuper = true, exclude = {"authToken"})
 @Data
 @Entity
 @Table (
@@ -42,29 +42,24 @@ public class User extends Persist {
     @JsonIgnore
     private String password;
 
-    @Column(name = "role")
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
-
-    @JsonManagedReference
-    @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<Address> addresses = new HashSet<>();
-
-    @JsonManagedReference
-    @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<BankDetails> bankDetails = new HashSet<>();
-
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "business_id")
-    @JsonIgnore
-    private Business business;
+    @Column(name = "roles")
+    private String roles;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "auth_token_id", referencedColumnName = "id")
     @JsonIgnore
     private AuthToken authToken;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonBackReference
+    private UserProfile userProfile;
+
+    public void createProfile() {
+        if (this.userProfile == null) {
+            this.userProfile = new UserProfile();
+            this.userProfile.setUser(this);
+        }
+    }
 
     @Override
     protected String setDefaultModifiedBy(){
@@ -75,38 +70,23 @@ public class User extends Persist {
         return retVal;
     }
 
-    @JsonIgnore
-    public void appendAddress(Address address) {
-        if (Objects.nonNull(address)){
-            var existing = Optional.ofNullable(this.getAddresses())
-                    .orElse(new LinkedHashSet<>());
-            address.setUser(this);
-            existing.add(address);
-            this.setAddresses(existing);
+    public Set<UserRole> fetchRole(){
+        if(roles == null || roles.isBlank()){
+            return new HashSet<>();
         }
+
+        return Arrays.stream(roles.split(COMMA))
+                .map(String::trim)
+                .map(UserRole::valueOf)
+                .collect(Collectors.toSet());
     }
 
-    @JsonIgnore
-    public void removeAddress(Address address) {
-        addresses.remove(address);
-        address.setUser(null);
-    }
-
-    @JsonIgnore
-    public void appendBankDetail(BankDetails bankDetails) {
-        if (Objects.nonNull(bankDetails)){
-            var existing = Optional.ofNullable(this.getBankDetails())
-                    .orElse(new LinkedHashSet<>());
-            bankDetails.setUser(this);
-            existing.add(bankDetails);
-            this.setBankDetails(existing);
-        }
-    }
-
-    @JsonIgnore
-    public void removeBankDetail(BankDetails bankDetail) {
-        bankDetails.remove(bankDetail);
-        bankDetail.setUser(null);
+    public void appendRole(UserRole role){
+        Set<UserRole> existingRole = fetchRole();
+        existingRole.add(role);
+        this.roles = existingRole.stream()
+                .map(Enum::name)
+                .collect(Collectors.joining(","));
     }
 
     @Override

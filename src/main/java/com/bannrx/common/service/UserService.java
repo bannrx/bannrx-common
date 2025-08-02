@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,7 +53,7 @@ public class UserService implements UserDetailsService {
     @Autowired private BankDetailsService bankDetailsService;
     @Autowired private AddressService addressService;
     @Autowired private UserProfileService profileService;
-
+    @Autowired private BCryptPasswordEncoder encoder;
     private static final String PASSWORD = "bannrx123";
 
     /**
@@ -89,7 +90,9 @@ public class UserService implements UserDetailsService {
     }
 
     private User toEntity(SignUpRequest request) throws ServerException {
+        var passwordEncoded = encoder.encode(request.getPassword());
         var retVal = ObjectMapperUtils.map(request, User.class);
+        retVal.setPassword(passwordEncoded);
         retVal.createProfile();
         var profile = retVal.getUserProfile();
         var bankDetails = bankDetailsService.toEntitySet(request.getBankDetailsDtoSet());

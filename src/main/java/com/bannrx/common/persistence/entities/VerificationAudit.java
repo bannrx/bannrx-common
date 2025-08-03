@@ -1,10 +1,8 @@
 package com.bannrx.common.persistence.entities;
 
-import com.bannrx.common.dtos.verification.VerificationData;
 import com.bannrx.common.enums.VerificationProcess;
 import com.bannrx.common.enums.VerificationPurpose;
 import com.bannrx.common.persistence.Persist;
-import com.bannrx.common.persistence.converters.VerificationDataConverter;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -142,6 +142,9 @@ public class UserService implements UserDetailsService {
         User user = fetchById(userDto.getId());
         validateUpdateRequest(userDto, user);
         ObjectMapperUtils.map(userDto,user);
+        if(!StringUtils.isBlank(userDto.getPassword())){
+            user.setPassword(encoder.encode(userDto.getPassword()));
+        }
         user = userRepository.save(user);
         return toDto(user);
     }

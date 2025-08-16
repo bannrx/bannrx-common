@@ -87,7 +87,7 @@ dependencies {
 	if (env == "local"){
 		implementation(project(":utility"))
 	} else {
-		implementation("com.rklab:utility:utility-0.0.7-SNAPSHOT")
+		implementation("com.rklab:utility:utility-0.0.8-SNAPSHOT")
 	}
 	implementation("org.springframework.boot:spring-boot-starter-security:3.1.0")
 	implementation("org.springframework.security:spring-security-config:6.0.0")

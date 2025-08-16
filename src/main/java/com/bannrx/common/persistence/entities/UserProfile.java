@@ -46,6 +46,10 @@ public class UserProfile extends Persist {
     @JsonIgnore
     private Set<Device> deviceSet = new HashSet<>();
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "userProfile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<Document> documentSet = new HashSet<>();
+
     @JsonIgnore
     public void appendAddress(Address address) {
         if (Objects.nonNull(address)){
@@ -78,6 +82,23 @@ public class UserProfile extends Persist {
     public void removeBankDetail(BankDetails bankDetail) {
         bankDetails.remove(bankDetail);
         bankDetail.setUserProfile(null);
+    }
+
+    @JsonIgnore
+    public void appendDocument(Document document){
+        if (Objects.nonNull(document)){
+            var existing = Optional.ofNullable(this.getDocumentSet())
+                    .orElse(new HashSet<>());
+            document.setUserProfile(this);
+            existing.add(document);
+            this.setDocumentSet(existing);
+        }
+    }
+
+    @JsonIgnore
+    public void removeDocument(Document document){
+        documentSet.remove(document);
+        document.setUserProfile(null);
     }
 
     @Override

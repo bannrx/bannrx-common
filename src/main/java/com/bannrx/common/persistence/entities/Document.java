@@ -4,12 +4,13 @@ package com.bannrx.common.persistence.entities;
 import com.bannrx.common.enums.DocumentStatus;
 import com.bannrx.common.enums.DocumentType;
 import com.bannrx.common.persistence.Persist;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import rklab.utility.utilities.JsonUtils;
 
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = {"userProfile"})
 @Entity
 @Data
 @Table(
@@ -43,6 +44,11 @@ public class Document extends Persist {
     //This can be used for horizontal partitioning
     @Column(name = "bucket", nullable = false)
     private String bucket;
+
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "user_profile_id", nullable = false)
+    private UserProfile userProfile;
 
     @Override
     public String getPrefix() {

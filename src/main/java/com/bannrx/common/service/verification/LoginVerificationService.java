@@ -5,7 +5,7 @@ import com.bannrx.common.dtos.verification.VerificationDto;
 import com.bannrx.common.enums.VerificationProcess;
 import com.bannrx.common.validationGroups.VerificationValidationGroup;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import rklab.utility.annotations.Loggable;
 import rklab.utility.expectations.InvalidInputException;
@@ -17,7 +17,7 @@ import static com.bannrx.common.enums.VerificationProcess.PASSWORD;
 @Loggable
 public class LoginVerificationService extends AbstractVerificationService{
 
-    @Autowired private BCryptPasswordEncoder encoder;
+    @Autowired private PasswordEncoder encoder;
 
     @Override
     public VerificationDto process(VerificationDto verificationDto)

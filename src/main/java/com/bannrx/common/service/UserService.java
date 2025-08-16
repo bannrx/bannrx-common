@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,8 +36,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import static com.bannrx.common.enums.UserRole.ROLE_BDA;
-
-
 import java.util.Objects;
 import java.util.Optional;
 
@@ -53,7 +51,7 @@ public class UserService implements UserDetailsService {
     @Autowired private BankDetailsService bankDetailsService;
     @Autowired private AddressService addressService;
     @Autowired private UserProfileService profileService;
-    @Autowired private BCryptPasswordEncoder encoder;
+    @Autowired private PasswordEncoder encoder;
     private static final String PASSWORD = "bannrx123";
 
     /**

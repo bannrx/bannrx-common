@@ -3,29 +3,28 @@ package com.bannrx.common.service.verification;
 import com.bannrx.common.dtos.verification.PasswordVerificationData;
 import com.bannrx.common.dtos.verification.VerificationDto;
 import com.bannrx.common.enums.VerificationProcess;
-import com.bannrx.common.mappers.VerificationMapper;
-import com.bannrx.common.service.UserService;
 import com.bannrx.common.validationGroups.VerificationValidationGroup;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import rklab.utility.annotations.Loggable;
 import rklab.utility.expectations.InvalidInputException;
-import rklab.utility.utilities.ValidationUtils;
-
 import static com.bannrx.common.enums.VerificationProcess.PASSWORD;
+
+
 
 @Service
 @Loggable
 public class LoginVerificationService extends AbstractVerificationService{
 
+    @Autowired private PasswordEncoder encoder;
 
     @Override
     public VerificationDto process(VerificationDto verificationDto)
             throws InvalidInputException {
         var passwordData = castVerificationData(verificationDto.getVerificationData(), PasswordVerificationData.class);
         var user = userService.fetchByUsername(passwordData.getUsername());
-        verificationDto.setVerified(StringUtils.equals(user.getPassword(), passwordData.getPassword()));
+        verificationDto.setVerified(encoder.matches(passwordData.getPassword(), user.getPassword()));
         return postProcess(verificationDto);
     }
 

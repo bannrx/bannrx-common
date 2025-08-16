@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,8 +36,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import static com.bannrx.common.enums.UserRole.ROLE_BDA;
-
-
 import java.util.Objects;
 import java.util.Optional;
 
@@ -52,7 +51,7 @@ public class UserService implements UserDetailsService {
     @Autowired private BankDetailsService bankDetailsService;
     @Autowired private AddressService addressService;
     @Autowired private UserProfileService profileService;
-
+    @Autowired private PasswordEncoder encoder;
     private static final String PASSWORD = "bannrx123";
 
     /**
@@ -89,7 +88,9 @@ public class UserService implements UserDetailsService {
     }
 
     private User toEntity(SignUpRequest request) throws ServerException {
+        var passwordEncoded = encoder.encode(request.getPassword());
         var retVal = ObjectMapperUtils.map(request, User.class);
+        retVal.setPassword(passwordEncoded);
         retVal.createProfile();
         var profile = retVal.getUserProfile();
         var bankDetails = bankDetailsService.toEntitySet(request.getBankDetailsDtoSet());
@@ -139,6 +140,9 @@ public class UserService implements UserDetailsService {
         User user = fetchById(userDto.getId());
         validateUpdateRequest(userDto, user);
         ObjectMapperUtils.map(userDto,user);
+        if(!StringUtils.isBlank(userDto.getPassword())){
+            user.setPassword(encoder.encode(userDto.getPassword()));
+        }
         user = userRepository.save(user);
         return toDto(user);
     }
